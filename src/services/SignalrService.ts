@@ -12,7 +12,7 @@ export default class SignalRService {
     public connect(logStream: RxSource<HubLog>): void {
         if (!this._client) {
             this._client = new signalR.HubConnectionBuilder()
-                .withUrl(`${APP_VARS.serverUrl}:${APP_VARS.protoPort}/${APP_VARS.signalLogHub}`)
+                .withUrl(`${APP_VARS.serverUrl}:${APP_VARS.signalPort}/${APP_VARS.signalLogHub}`)
                 .build();
 
             this._client.on("BroadcastLog", data => {

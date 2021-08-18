@@ -39,7 +39,7 @@ export default class LogsService {
             request.setQuery(searchQuery);
         }
 
-        const resp = await this._client.fetch(request, null);
+        const resp = await this._client.fetch(request, {  });
         const jsResp = resp.toObject();
 
         if (jsResp.issuccess) {
