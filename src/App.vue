@@ -52,10 +52,24 @@ export default class App extends Vue {
   @Ref() readonly sidenav!: SideNav;
   public readonly sideBarStateEmitter = new RxSource<Boolean>();
 
+  private disposables: (() => void)[] = [];
+
   public mounted(): void {
-    this.signalRService.connect(this.logsService.logsStream);
+    this.disposables.push(
+      this.settingsService.livetypeLoadingStream.on((isEnabled) => {
+        if (isEnabled) {
+          this.signalRService.connect(this.logsService.logsStream);
+        } else {
+          this.signalRService.disconnect();
+        }
+      })
+    );
   }
   public async unmounted(): Promise<void> {
+    for (const disposable of this.disposables) {
+      disposable();
+    }
+    this.disposables.length = 0;
     await this.signalRService.disconnect();
   }
 }

@@ -19,9 +19,12 @@ import LogRecordComponent from "./LogRecordComponent.vue";
 import Loader from "@/components/layout/Loader.vue";
 // services
 import LogsService from "@/services/LogsService";
-import { DeafLog, DeafScope } from "@/types/FetchModels";
+import MapService from "@/services/MapService";
 import SettingsService from "@/services/SettingsService";
+// types | utils
+import { DeafLog, DeafScope } from "@/types/FetchModels";
 import { isDebug } from "@/utils/environments";
+import { HubLog, HubScope } from "@/types/HubModels";
 
 @Options({
   components: {
@@ -33,22 +36,30 @@ import { isDebug } from "@/utils/environments";
 export default class LogsListComponent extends Vue {
   @Inject() logsService!: LogsService;
   @Inject() settingsService!: SettingsService;
+  @Inject() mapService!: MapService;
 
   public fetchetData: (DeafScope | DeafLog)[] = [];
   public isLoading = false;
+  private searchQuery?: string;
 
   private disposables: (() => void)[] = [];
 
   public async mounted(): Promise<void> {
-    const unsub = this.logsService.logsStream.on((newLog) => {
-      this.fetchLogsAndRender();
-    });
-    this.disposables.push(unsub);
+    this.disposables.push(
+      this.logsService.logsStream.on((newLog) => {
+        // we dont load livetime when we make search with query
+        if (this.searchQuery === null || this.searchQuery === void 0) {
+          this.realtimeUpdate(newLog);
+        }
+      })
+    );
 
-    const unsub2 = this.settingsService.searchStream.on((searchQuery: string) => {
-      this.fetchLogsAndRender(searchQuery);
-    });
-    this.disposables.push(unsub2);
+    this.disposables.push(
+      this.settingsService.searchStream.on((searchQuery: string) => {
+        this.searchQuery = searchQuery;
+        this.fetchLogsAndRender(searchQuery);
+      })
+    );
 
     await this.fetchLogsAndRender();
   }
@@ -59,6 +70,17 @@ export default class LogsListComponent extends Vue {
         disposable();
       }
       this.disposables.length = 0;
+    }
+  }
+
+  private realtimeUpdate(newLog: HubLog | HubScope): void {
+    if (newLog instanceof HubScope) {
+      this.fetchetData = this.mapService.mapHubScope(newLog, this.fetchetData);
+    } else if (newLog instanceof HubLog) {
+      this.fetchetData = this.mapService.applyHubLogToData(
+        newLog,
+        this.fetchetData
+      );
     }
   }
 

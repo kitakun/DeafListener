@@ -1,16 +1,17 @@
+import RxSource from "@/utils/rx/SourceRx";
 import RxVariable from "@/utils/rx/VariableRx";
 
 export default class SettingsService {
     public readonly logViewType: RxVariable<Header_LogViewTypeEnum>;
     public readonly logDirectionViewType: RxVariable<Header_LogDirectionViewTypeEnum>;
-    public readonly searchStream: RxVariable<string>;
+    public readonly searchStream: RxSource<string>;
     public readonly livetypeLoadingStream: RxVariable<boolean>;
 
     constructor() {
-        this.logViewType = new RxVariable<Header_LogViewTypeEnum>(Header_LogViewTypeEnum.ShowAllScopes)
-        this.logDirectionViewType = new RxVariable<Header_LogDirectionViewTypeEnum>(Header_LogDirectionViewTypeEnum.Grid)
-        this.searchStream = new RxVariable('');
-        this.livetypeLoadingStream = new RxVariable<boolean>(true);
+        this.logViewType = new RxVariable<Header_LogViewTypeEnum>(Header_LogViewTypeEnum.ShowAllScopes, true)
+        this.logDirectionViewType = new RxVariable<Header_LogDirectionViewTypeEnum>(Header_LogDirectionViewTypeEnum.Grid, true)
+        this.searchStream = new RxSource<string>();
+        this.livetypeLoadingStream = new RxVariable<boolean>(true, true);
     }
 }
 

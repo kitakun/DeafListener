@@ -20,3 +20,23 @@ export class HubLog {
         this.stackTrace = data.stackTrace ?? '-';
     }
 }
+
+export class HubScope {
+    id: number;
+    createdAt: Date;
+
+    rootScopeId?: number;
+    ownerScopeId?: number;
+
+    project: string;
+    environment: string;
+
+    constructor(data: Partial<HubScope>) {
+        this.id = data.id ?? 0;
+        this.createdAt = data.createdAt ?? new Date();
+        this.rootScopeId = data.rootScopeId ?? -2;
+        this.ownerScopeId = data.ownerScopeId ?? -2;
+        this.project = data.project ?? '-';
+        this.environment = data.environment ?? '-';
+    }
+}

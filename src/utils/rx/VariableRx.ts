@@ -5,12 +5,14 @@ export default class RxVariable<T> {
 
     private _value: T;
     private _cbs: GenericVoidCallback<T>[] = [];
+    private readonly _emitOnSubscribe: boolean;
 
     public get value(): T {
         return this._value;
     }
 
-    constructor(defaultVariable: T) {
+    constructor(defaultVariable: T, emitOnSubscribe = false) {
+        this._emitOnSubscribe = emitOnSubscribe;
         this._value = defaultVariable;
     }
 
@@ -25,6 +27,9 @@ export default class RxVariable<T> {
 
     public on(cb: GenericVoidCallback<T>): emptyCallback {
         this._cbs.push(cb);
+        if (this._emitOnSubscribe) {
+            cb(this.value);
+        }
 
         const unsubscribe = () => {
             const index = this._cbs.indexOf(cb);

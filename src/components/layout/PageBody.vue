@@ -12,6 +12,7 @@ export default class PageBody extends Vue {}
 
 <style scoped>
 .root-container {
+  width: 100%;
   min-height: calc(100% - 57px);
   background-color: rgb(25 20 97 / 3%);
 }

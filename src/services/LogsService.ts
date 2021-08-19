@@ -3,7 +3,7 @@ import { LoggerClientClient } from '@/proto/generated/Logi_clientServiceClientPb
 import { FetchLogRequest, PingRequest } from "@/proto/generated/logi_client_pb";
 // types
 import { DeafLog, DeafScope } from '@/types/FetchModels';
-import { HubLog } from '@/types/HubModels';
+import { HubLog, HubScope } from '@/types/HubModels';
 // services
 import { APP_VARS, isDebug } from '@/utils/environments';
 import RxSource from '@/utils/rx/SourceRx';
@@ -13,7 +13,7 @@ export default class LogsService {
     private _client: LoggerClientClient;
 
     private readonly mapService = new MapService();
-    public readonly logsStream = new RxSource<HubLog>();
+    public readonly logsStream = new RxSource<HubLog | HubScope>();
 
     constructor() {
         this._client = new LoggerClientClient(`${APP_VARS.serverUrl}:${APP_VARS.protoPort}`);

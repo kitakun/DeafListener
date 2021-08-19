@@ -2,6 +2,7 @@
 import { FetchLogResponse, LogLevel, LogMessage, LogScope } from "@/proto/generated/logi_client_pb";
 // types
 import { DeafExceptionLog, DeafLog, DeafScope } from '@/types/FetchModels';
+import { HubLog, HubScope } from "@/types/HubModels";
 import { LogPreviewData } from "@/types/LogRenderModels";
 // utils
 import { formatLogTime } from "@/utils/datetime";
@@ -61,7 +62,7 @@ export default class MapService {
         if (!sortedData) {
             sortedData = this.getSortedMessages(scope, jsResp, innerLogs, innerScopes);
         }
-        
+
         const result = new DeafScope({
             createdAt: toDate(scope.createdat),
             scopeId: scope.scopeid,
@@ -73,6 +74,61 @@ export default class MapService {
             logsBlockPreviev: this.lookForLogsPreview(scope.scopeid, jsResp, sortedData)
         });
         return result;
+    }
+
+    public mapHubScope(hubScope: HubScope, existingData: (DeafScope | DeafLog)[]): (DeafScope | DeafLog)[] {
+        if (!hubScope.ownerScopeId || hubScope.ownerScopeId <= 0) {
+            // create root scope
+            const result = new DeafScope({
+                createdAt: hubScope.createdAt,
+                scopeId: hubScope.id,
+                innerLogs: [],
+                innerScopes: [],
+                logsBlockPreviev: []
+            });
+
+            return [...existingData, result];
+        } else {
+            // create parented scope
+            const rootScopeId = hubScope.rootScopeId;
+            const rootScope = existingData.find(f => f instanceof DeafScope && f.scopeId === rootScopeId) as DeafScope;
+            if (rootScope) {
+                const ownerScope = this.lookForOwnerScope(hubScope.ownerScopeId, rootScope);
+                if (ownerScope) {
+                    ownerScope.innerScopes.push(new DeafScope({
+                        createdAt: hubScope.createdAt,
+                        innerLogs: [],
+                        innerScopes: [],
+                        scopeId: hubScope.id,
+                        logsBlockPreviev: [],
+                    }));
+                }
+            }
+        }
+        // do nothing
+        return existingData;
+    }
+
+    public applyHubLogToData(hubLog: HubLog, existingData: (DeafScope | DeafLog)[]): (DeafScope | DeafLog)[] {
+        const rootScopeId = hubLog.rootScopeId;
+        const rootScope = existingData.find(f => f instanceof DeafScope && f.scopeId === rootScopeId);
+        if (rootScope && rootScope instanceof DeafScope) {
+            const newData = [...existingData];
+            const parentScope = this.lookForOwnerScope(hubLog.ownerScopeId, rootScope);
+            if (parentScope) {
+                parentScope.innerLogs.push(new DeafLog({
+                    message: hubLog.message,
+                    level: hubLog.logLevel,
+                    logId: hubLog.id,
+                    createdAt: hubLog.createdAt,
+                    parameterMap: [],
+                }));
+                // rootScope.logsBlockPreviev = this.lookForLogsPreview(rootScope.scopeId, jsResp, sortedData)
+                return newData;
+            }
+        }
+        // we can't add this log due root scope is not visible
+        return existingData;
     }
 
     private lookForLogsPreview(
@@ -160,5 +216,24 @@ export default class MapService {
             if (dateA > dateB) return 1;
             return 0;
         });
+    }
+
+    private lookForOwnerScope(scopeId: number, rootScope: DeafScope): DeafScope | null {
+        if (rootScope.scopeId === scopeId) {
+            return rootScope;
+        }
+
+        for (const innerScope of rootScope.innerScopes) {
+            if (innerScope.scopeId === scopeId) {
+                return innerScope;
+            } else {
+                const res = this.lookForOwnerScope(scopeId, innerScope);
+                if (res) {
+                    return res;
+                }
+            }
+        }
+
+        return null;
     }
 }
