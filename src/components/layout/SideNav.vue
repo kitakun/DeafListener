@@ -2,21 +2,48 @@
   <div class="nav-root">
     <div ref="sidenavRoot" class="sidenav">
       <div class="setting-block">
+        <span>Livetime logs</span>
+        <input
+          :checked="isLivetimeEnabled"
+          v-on:click="toggleLivetimeLoading()"
+          type="checkbox"
+        />
+      </div>
+      <div class="setting-block">
         <span>Logs view type:</span>
         <ul class="tab">
           <li
-            v-for="(item, index) in items"
+            v-for="(item, index) in logsScopeViewsItems"
             v-bind:key="index"
             v-bind:class="{ active: item.active }"
           >
             <input
               v-bind:id="'tab' + index"
               :checked="item.active"
-              v-on:click="toggleActive(item)"
+              v-on:click="toggleScopesViewState(item)"
               type="radio"
               v-bind:name="'tab' + index"
             />
             <label v-bind:for="'tab' + index">{{ item.text }}</label>
+          </li>
+        </ul>
+      </div>
+      <div class="setting-block">
+        <span>Logs direction</span>
+        <ul class="tab">
+          <li
+            v-for="(item, index) in logsDirectionViewsItems"
+            v-bind:key="index"
+            v-bind:class="{ active: item.active }"
+          >
+            <input
+              v-bind:id="'d_tab' + index"
+              :checked="item.active"
+              v-on:click="toggleDirectionViewState(item)"
+              type="radio"
+              v-bind:name="'d_tab' + index"
+            />
+            <label v-bind:for="'d_tab' + index">{{ item.text }}</label>
           </li>
         </ul>
       </div>
@@ -30,9 +57,10 @@
 import { Vue } from "vue-class-component";
 import { Inject, Prop, Ref } from "vue-property-decorator";
 // service
-import HeaderService, {
+import SettingsService, {
+  Header_LogDirectionViewTypeEnum,
   Header_LogViewTypeEnum,
-} from "@/services/HeaderService";
+} from "@/services/SettingsService";
 // components
 // utils
 import RxSource from "@/utils/rx/SourceRx";
@@ -47,11 +75,17 @@ export default class SideNav extends Vue {
   public isOpened = false;
   @Ref() sidenavRoot!: HTMLDivElement;
   @Prop() sidebarEmitter!: RxSource<Boolean>;
-  private _disposable: (() => void)[] = [];
+  private disposables: (() => void)[] = [];
   //
-  @Inject() headerService!: HeaderService;
+  @Inject() settingsService!: SettingsService;
+  public get isLivetimeEnabled(): boolean {
+    if (this.settingsService && this.settingsService.livetypeLoadingStream) {
+      return this.settingsService.livetypeLoadingStream.value;
+    }
+    return false;
+  }
 
-  public items: ITogglable<Header_LogViewTypeEnum>[] = [
+  public logsScopeViewsItems: ITogglable<Header_LogViewTypeEnum>[] = [
     {
       text: "All scopes",
       active: true,
@@ -69,46 +103,83 @@ export default class SideNav extends Vue {
     },
   ];
 
+  public logsDirectionViewsItems: ITogglable<Header_LogDirectionViewTypeEnum>[] =
+    [
+      {
+        text: "Grid",
+        active: true,
+        value: Header_LogDirectionViewTypeEnum.Grid,
+      },
+      {
+        text: "Vertical",
+        active: false,
+        value: Header_LogDirectionViewTypeEnum.VerticalLine,
+      },
+    ];
+
   public mounted(): void {
     // open/close sidebar
-    this._disposable.push(
-      this.sidebarEmitter.on((newState) => {
-        if (newState) {
-          this.open();
-        } else {
-          this.close();
-        }
-      })
-    );
+    {
+      this.disposables.push(
+        this.sidebarEmitter.on((newState) => {
+          if (newState) {
+            this.open();
+          } else {
+            this.close();
+          }
+        })
+      );
+    }
     // logs view setting
-    this._disposable.push(
-      this.headerService.logViewType.on((newVal) => {
-        this.items.forEach((f) => {
-          f.active = f.value === newVal;
-        });
-      })
-    );
-    this.items.forEach((f) => {
-      f.active = f.value === this.headerService.logViewType.value;
-    });
+    {
+      this.disposables.push(
+        this.settingsService.logViewType.on((newVal) => {
+          this.logsScopeViewsItems.forEach((f) => {
+            f.active = f.value === newVal;
+          });
+        })
+      );
+      this.logsScopeViewsItems.forEach((f) => {
+        f.active = f.value === this.settingsService.logViewType.value;
+      });
+    }
+    // logs direction view setting
+    {
+      this.disposables.push(
+        this.settingsService.logDirectionViewType.on((newVal) => {
+          this.logsDirectionViewsItems.forEach((f) => {
+            f.active = f.value === newVal;
+          });
+        })
+      );
+      this.logsDirectionViewsItems.forEach((f) => {
+        f.active = f.value === this.settingsService.logDirectionViewType.value;
+      });
+    }
   }
   public unmounted(): void {
-    if (this._disposable.length) {
-      for (const disposable of this._disposable) {
+    if (this.disposables.length) {
+      for (const disposable of this.disposables) {
         disposable();
       }
-      this._disposable.length = 0;
+      this.disposables.length = 0;
     }
   }
 
-  public toggleActive(item: ITogglable<Header_LogViewTypeEnum>) {
-    this.headerService.logViewType.setValue(item.value);
+  public toggleLivetimeLoading(): void {
+    this.settingsService.livetypeLoadingStream.setValue(
+      !this.settingsService.livetypeLoadingStream.value
+    );
+  }
+  public toggleDirectionViewState(
+    item: ITogglable<Header_LogDirectionViewTypeEnum>
+  ) {
+    this.settingsService.logDirectionViewType.setValue(item.value);
+  }
+  public toggleScopesViewState(item: ITogglable<Header_LogViewTypeEnum>) {
+    this.settingsService.logViewType.setValue(item.value);
   }
   // sidebar toggle
-  public toggle(): void {
-    this.isOpened = !this.isOpened;
-    this.applyState();
-  }
   public open(): void {
     this.isOpened = true;
     this.applyState();

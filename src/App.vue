@@ -4,7 +4,7 @@
     <PageBody>
       <SearchBlock
         :isBusy="false"
-        :searchStream="headerService.searchStream"
+        :searchStream="settingsService.searchStream"
         :lookFor="'Search text:'"
       ></SearchBlock>
       <LogsListComponent></LogsListComponent>
@@ -22,7 +22,7 @@ import { Provide, Ref } from "vue-property-decorator";
 // services
 import LogsService from "./services/LogsService";
 import MapService from "./services/MapService";
-import HeaderService from "./services/HeaderService";
+import SettingsService from "./services/SettingsService";
 import SignalRService from "./services/SignalrService";
 // components
 import Header from "@/components/layout/Header.vue";
@@ -47,7 +47,7 @@ import RxSource from "./utils/rx/SourceRx";
 export default class App extends Vue {
   @Provide() readonly logsService = new LogsService();
   @Provide() readonly mapService = new MapService();
-  @Provide() readonly headerService = new HeaderService();
+  @Provide() readonly settingsService = new SettingsService();
   @Provide() readonly signalRService = new SignalRService();
   @Ref() readonly sidenav!: SideNav;
   public readonly sideBarStateEmitter = new RxSource<Boolean>();
@@ -148,5 +148,12 @@ ul.tab {
       color: white;
     }
   }
+}
+
+input[type="checkbox"] {
+  width: 24px;
+  height: 24px;
+  position: relative;
+  top: 6px;
 }
 </style>

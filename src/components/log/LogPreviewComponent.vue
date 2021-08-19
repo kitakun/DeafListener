@@ -53,9 +53,9 @@ import { LogPreviewData } from "@/types/LogRenderModels";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogMessageComponent from "@/components/log/LogMessageComponent.vue";
 // services
-import HeaderService, {
+import SettingsService, {
   Header_LogViewTypeEnum,
-} from "@/services/HeaderService";
+} from "@/services/SettingsService";
 
 @Options({
   components: {
@@ -69,7 +69,7 @@ export default class LogPreviewComponent extends Vue {
   @Prop() public log!: LogPreviewData;
   @Prop() public sharedData!: (DeafScope | DeafLog)[];
   // services
-  @Inject() headerService!: HeaderService;
+  @Inject() settingsService!: SettingsService;
 
   public get isScope(): boolean {
     return this.log.isScope;
@@ -80,15 +80,15 @@ export default class LogPreviewComponent extends Vue {
   // how to render
   public get couldUseScopesInRender(): boolean {
     return (
-      this.headerService.logViewType.value ===
+      this.settingsService.logViewType.value ===
         Header_LogViewTypeEnum.ShowOnlyMainScope ||
-      this.headerService.logViewType.value ===
+      this.settingsService.logViewType.value ===
         Header_LogViewTypeEnum.ShowAllScopes
     );
   }
   public get couldRenderOnlyMainScope(): boolean {
     return (
-      this.headerService.logViewType.value ===
+      this.settingsService.logViewType.value ===
       Header_LogViewTypeEnum.ShowOnlyMainScope
     );
   }

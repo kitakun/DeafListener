@@ -20,7 +20,7 @@ import Loader from "@/components/layout/Loader.vue";
 // services
 import LogsService from "@/services/LogsService";
 import { DeafLog, DeafScope } from "@/types/FetchModels";
-import HeaderService from "@/services/HeaderService";
+import SettingsService from "@/services/SettingsService";
 import { isDebug } from "@/utils/environments";
 
 @Options({
@@ -32,7 +32,7 @@ import { isDebug } from "@/utils/environments";
 /* here we loading all logs that can show to client */
 export default class LogsListComponent extends Vue {
   @Inject() logsService!: LogsService;
-  @Inject() headerService!: HeaderService;
+  @Inject() settingsService!: SettingsService;
 
   public fetchetData: (DeafScope | DeafLog)[] = [];
   public isLoading = false;
@@ -45,7 +45,7 @@ export default class LogsListComponent extends Vue {
     });
     this.disposables.push(unsub);
 
-    const unsub2 = this.headerService.searchStream.on((searchQuery: string) => {
+    const unsub2 = this.settingsService.searchStream.on((searchQuery: string) => {
       this.fetchLogsAndRender(searchQuery);
     });
     this.disposables.push(unsub2);
