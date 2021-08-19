@@ -1,9 +1,15 @@
 <template>
-  <Header :title="'PIM Logs'"></Header>
-  <PageBody>
-    <SearchBlock :isBusy="false" :searchStream="headerService.searchStream" :lookFor="'Search text:'"></SearchBlock>
-    <LogsListComponent></LogsListComponent>
-  </PageBody>
+  <Header :title="'PIM Logs'" :sidebarEmitter="sideBarStateEmitter"></Header>
+  <SideNav ref="sidenav" :sidebarEmitter="sideBarStateEmitter">
+    <PageBody>
+      <SearchBlock
+        :isBusy="false"
+        :searchStream="headerService.searchStream"
+        :lookFor="'Search text:'"
+      ></SearchBlock>
+      <LogsListComponent></LogsListComponent>
+    </PageBody>
+  </SideNav>
 </template>
 
 <script lang="ts">
@@ -12,7 +18,7 @@ import "reflect-metadata";
 import { Vue } from "vue-class-component";
 import { Options } from "vue-class-component";
 // 3rdparty
-import { Provide } from "vue-property-decorator";
+import { Provide, Ref } from "vue-property-decorator";
 // services
 import LogsService from "./services/LogsService";
 import MapService from "./services/MapService";
@@ -20,25 +26,31 @@ import HeaderService from "./services/HeaderService";
 import SignalRService from "./services/SignalrService";
 // components
 import Header from "@/components/layout/Header.vue";
+import SideNav from "@/components/layout/SideNav.vue";
 import PageBody from "@/components/layout/PageBody.vue";
 import SearchBlock from "@/components/layout/SearchBlock.vue";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
+// utils
+import RxSource from "./utils/rx/SourceRx";
 
 @Options({
   components: {
     Header,
     PageBody,
+    SideNav,
     SearchBlock,
     ExpandableBlock,
     LogsListComponent,
   },
 })
 export default class App extends Vue {
-  @Provide() logsService = new LogsService();
-  @Provide() mapService = new MapService();
-  @Provide() headerService = new HeaderService();
-  @Provide() signalRService = new SignalRService();
+  @Provide() readonly logsService = new LogsService();
+  @Provide() readonly mapService = new MapService();
+  @Provide() readonly headerService = new HeaderService();
+  @Provide() readonly signalRService = new SignalRService();
+  @Ref() readonly sidenav!: SideNav;
+  public readonly sideBarStateEmitter = new RxSource<Boolean>();
 
   public mounted(): void {
     this.signalRService.connect(this.logsService.logsStream);

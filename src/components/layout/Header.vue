@@ -1,87 +1,28 @@
 <template>
   <div class="header">
-    <div class="half">
-      <h1>{{ title }}</h1>
+    <div class="sidenav-btn">
+      <button class="btn-expand" v-on:click="toggleSidebar()">≡</button>
     </div>
     <div class="half">
-      <span>Logs view type:</span>
-      <ul class="tab">
-        <li
-          v-for="(item, index) in items"
-          v-bind:key="index"
-          v-bind:class="{ active: item.active }"
-        >
-          <input
-            v-bind:id="'tab' + index"
-            :checked="item.active"
-            v-on:click="toggleActive(item)"
-            type="radio"
-            v-bind:name="'tab' + index"
-          />
-          <label v-bind:for="'tab' + index">{{ item.text }}</label>
-        </li>
-      </ul>
+      <h1>{{ title }}</h1>
     </div>
   </div>
 </template>
 
 <script lang="ts">
 import { Vue } from "vue-class-component";
-import { Inject, Prop } from "vue-property-decorator";
-// service
-import HeaderService, {
-  Header_LogViewTypeEnum,
-} from "@/services/HeaderService";
-
-interface ITogglable<T> {
-  text: string;
-  active: boolean;
-  value: T;
-}
+import { Prop } from "vue-property-decorator";
+// utils
+import RxSource from "@/utils/rx/SourceRx";
 
 export default class Header extends Vue {
   @Prop() title!: string;
-  @Inject() headerService!: HeaderService;
+  @Prop() sidebarEmitter!: RxSource<Boolean>;
+  private isSidebarActive = false;
 
-  public items: ITogglable<Header_LogViewTypeEnum>[] = [
-    {
-      text: "All scopes",
-      active: true,
-      value: Header_LogViewTypeEnum.ShowAllScopes,
-    },
-    // {
-    //   text: "Root scopes",
-    //   active: false,
-    //   value: Header_LogViewTypeEnum.ShowOnlyMainScope,
-    // },
-    {
-      text: "Default logs",
-      active: false,
-      value: Header_LogViewTypeEnum.DefaultLogsView,
-    },
-  ];
-
-  private disposables?: () => void;
-
-  public mounted(): void {
-    this.disposables = this.headerService.logViewType.on((newVal) => {
-      this.items.forEach((f) => {
-        f.active = f.value === newVal;
-      });
-    });
-    this.items.forEach((f) => {
-      f.active = f.value === this.headerService.logViewType.value;
-    });
-  }
-  public unmounted(): void {
-    if (this.disposables) {
-      this.disposables();
-      this.disposables = void 0;
-    }
-  }
-
-  public toggleActive(item: ITogglable<Header_LogViewTypeEnum>) {
-    this.headerService.logViewType.setValue(item.value);
+  public toggleSidebar(): void {
+    this.isSidebarActive = !this.isSidebarActive;
+    this.sidebarEmitter.emit(this.isSidebarActive);
   }
 }
 </script>
@@ -97,7 +38,12 @@ export default class Header extends Vue {
   flex-direction: row;
   flex-wrap: nowrap;
   align-content: center;
-  justify-content: space-around;
+  justify-content: flex-start;;
   align-items: center;
+  .sidenav-btn {
+    width: 40px;
+    padding-right: 60px;
+    padding-left: 20px;
+  }
 }
 </style>
