@@ -63,7 +63,7 @@ import SettingsService, {
 } from "@/services/SettingsService";
 // components
 // utils
-import RxSource from "@/utils/rx/SourceRx";
+import RxVariable from "@/utils/rx/VariableRx";
 
 interface ITogglable<T> {
   text: string;
@@ -74,7 +74,7 @@ interface ITogglable<T> {
 export default class SideNav extends Vue {
   public isOpened = false;
   @Ref() sidenavRoot!: HTMLDivElement;
-  @Prop() sidebarEmitter!: RxSource<Boolean>;
+  @Prop() sidebarEmitter!: RxVariable<Boolean>;
   private disposables: (() => void)[] = [];
   //
   @Inject() settingsService!: SettingsService;

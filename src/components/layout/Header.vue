@@ -13,16 +13,14 @@
 import { Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 // utils
-import RxSource from "@/utils/rx/SourceRx";
+import RxVariable from "@/utils/rx/VariableRx";
 
 export default class Header extends Vue {
   @Prop() title!: string;
-  @Prop() sidebarEmitter!: RxSource<Boolean>;
-  private isSidebarActive = false;
+  @Prop() sidebarEmitter!: RxVariable<Boolean>;
 
   public toggleSidebar(): void {
-    this.isSidebarActive = !this.isSidebarActive;
-    this.sidebarEmitter.emit(this.isSidebarActive);
+    this.sidebarEmitter.setValue(!this.sidebarEmitter.value);
   }
 }
 </script>

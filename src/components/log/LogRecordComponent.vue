@@ -1,5 +1,11 @@
 <template>
-  <div class="log-record" v-bind:class="{ expanded: p_isExpanded }">
+  <div
+    class="log-record"
+    v-bind:class="{
+      expanded: p_isExpanded,
+      sideBarIsOpened: sideBarStateEmitter.value && verticalViewType === 1,
+    }"
+  >
     <div class="log-record-header">
       <button v-if="!p_isExpanded" v-on:click="toggle" class="btn-expand">
         ►
@@ -8,10 +14,17 @@
       <div class="title elepsis">{{ log.message }}</div>
       <span class="created-at">{{ createdAt }}</span>
     </div>
-    <div class="content elepsis"
+    <div
+      class="content elepsis"
       :key="index"
-      v-for="(previewLog, index) in log.logsBlockPreviev">
-      <LogPreviewComponent :log="previewLog" :sharedData="sharedData" :key="index"></LogPreviewComponent>
+      v-for="(previewLog, index) in log.logsBlockPreviev"
+    >
+      <LogPreviewComponent
+        :log="previewLog"
+        :sharedData="sharedData"
+        :verticalViewType="verticalViewType"
+        :key="index"
+      ></LogPreviewComponent>
     </div>
   </div>
 </template>
@@ -22,11 +35,12 @@ import { Options, Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 // unilts
 import { formatLogTime } from "@/utils/datetime";
+import RxVariable from "@/utils/rx/VariableRx";
 // types
 import { DeafLog, DeafScope } from "@/types/FetchModels";
 // components
-import LogPreviewComponent from './LogPreviewComponent.vue';
-
+import LogPreviewComponent from "./LogPreviewComponent.vue";
+import { Header_LogDirectionViewTypeEnum } from "@/services/SettingsService";
 
 @Options({
   components: {
@@ -35,10 +49,12 @@ import LogPreviewComponent from './LogPreviewComponent.vue';
 })
 /* here we building View for root logs container */
 export default class LogRecordComponent extends Vue {
+  @Prop() readonly sideBarStateEmitter!: RxVariable<Boolean>;
   // props
   @Prop() public log!: DeafScope | DeafLog;
   @Prop() public sharedData!: (DeafScope | DeafLog)[];
   @Prop() public isExpanded: boolean = false;
+  @Prop() public verticalViewType!: Header_LogDirectionViewTypeEnum;
 
   // computed
   public get isScope(): boolean {
@@ -87,6 +103,9 @@ export default class LogRecordComponent extends Vue {
   margin-top: 5px;
   padding: 5px;
   transition: all 0.2s ease-in-out;
+  &.sideBarIsOpened {
+    width: 100%;
+  }
   &.expanded {
     border: 4px solid #29668f;
     width: 100%;
@@ -131,5 +150,4 @@ export default class LogRecordComponent extends Vue {
     text-align: left;
   }
 }
-
 </style>

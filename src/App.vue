@@ -1,13 +1,13 @@
 <template>
   <Header :title="'PIM Logs'" :sidebarEmitter="sideBarStateEmitter"></Header>
   <SideNav ref="sidenav" :sidebarEmitter="sideBarStateEmitter">
-    <PageBody>
+    <PageBody :sideBarStateEmitter="sideBarStateEmitter">
       <SearchBlock
         :isBusy="false"
         :searchStream="settingsService.searchStream"
         :lookFor="'Search text:'"
       ></SearchBlock>
-      <LogsListComponent></LogsListComponent>
+      <LogsListComponent :sideBarStateEmitter="sideBarStateEmitter"></LogsListComponent>
     </PageBody>
   </SideNav>
 </template>
@@ -32,7 +32,7 @@ import SearchBlock from "@/components/layout/SearchBlock.vue";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
-import RxSource from "./utils/rx/SourceRx";
+import RxVariable from "./utils/rx/VariableRx";
 
 @Options({
   components: {
@@ -50,7 +50,7 @@ export default class App extends Vue {
   @Provide() readonly settingsService = new SettingsService();
   @Provide() readonly signalRService = new SignalRService();
   @Ref() readonly sidenav!: SideNav;
-  public readonly sideBarStateEmitter = new RxSource<Boolean>();
+  public readonly sideBarStateEmitter = new RxVariable<Boolean>(false, true);
 
   private disposables: (() => void)[] = [];
 
@@ -83,6 +83,7 @@ body {
   height: 100%;
   padding: 0px;
   margin: 0px;
+  overflow: hidden;
 }
 *,
 *:before,

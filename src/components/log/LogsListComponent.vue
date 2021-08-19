@@ -1,9 +1,18 @@
 <template>
-  <div class="logs-list" v-if="!!fetchetData">
+  <div
+    class="logs-list"
+    v-if="!!fetchetData"
+    v-bind:class="{
+      grid: verticalViewType === 0,
+      vertical: verticalViewType === 1,
+    }"
+  >
     <LogRecordComponent
       v-for="(item, index) in fetchetData"
       :log="item"
       :sharedData="fetchetData"
+      :sideBarStateEmitter="sideBarStateEmitter"
+      :verticalViewType="verticalViewType"
       :key="index"
     ></LogRecordComponent>
   </div>
@@ -13,18 +22,21 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Inject } from "vue-property-decorator";
+import { Inject, Prop } from "vue-property-decorator";
 // components
 import LogRecordComponent from "./LogRecordComponent.vue";
 import Loader from "@/components/layout/Loader.vue";
 // services
 import LogsService from "@/services/LogsService";
 import MapService from "@/services/MapService";
-import SettingsService from "@/services/SettingsService";
+import SettingsService, {
+  Header_LogDirectionViewTypeEnum,
+} from "@/services/SettingsService";
 // types | utils
 import { DeafLog, DeafScope } from "@/types/FetchModels";
 import { isDebug } from "@/utils/environments";
 import { HubLog, HubScope } from "@/types/HubModels";
+import RxVariable from "@/utils/rx/VariableRx";
 
 @Options({
   components: {
@@ -34,13 +46,15 @@ import { HubLog, HubScope } from "@/types/HubModels";
 })
 /* here we loading all logs that can show to client */
 export default class LogsListComponent extends Vue {
-  @Inject() logsService!: LogsService;
-  @Inject() settingsService!: SettingsService;
-  @Inject() mapService!: MapService;
+  @Prop() readonly sideBarStateEmitter!: RxVariable<Boolean>;
+  @Inject() readonly logsService!: LogsService;
+  @Inject() readonly settingsService!: SettingsService;
+  @Inject() readonly mapService!: MapService;
 
   public fetchetData: (DeafScope | DeafLog)[] = [];
   public isLoading = false;
   private searchQuery?: string;
+  private verticalViewType = Header_LogDirectionViewTypeEnum.Grid;
 
   private disposables: (() => void)[] = [];
 
@@ -58,6 +72,12 @@ export default class LogsListComponent extends Vue {
       this.settingsService.searchStream.on((searchQuery: string) => {
         this.searchQuery = searchQuery;
         this.fetchLogsAndRender(searchQuery);
+      })
+    );
+
+    this.disposables.push(
+      this.settingsService.logDirectionViewType.on((newVal) => {
+        this.verticalViewType = newVal;
       })
     );
 
@@ -106,14 +126,19 @@ export default class LogsListComponent extends Vue {
 }
 </script>
 
-<style scoped>
+<style scoped lang="scss">
 .logs-list {
   width: calc(100% - 20px);
   padding-left: 20px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  align-content: flex-start;
-  justify-content: flex-start;
+  padding-bottom: 20px;
+  overflow: auto;
+  height: calc(100% - 172px);
+  &.grid {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: flex-start;
+  }
 }
 </style>
