@@ -3,6 +3,7 @@
     class="log-record"
     v-bind:class="{
       expanded: p_isExpanded,
+      isVerticalView: verticalViewType === 1,
       sideBarIsOpened: sideBarStateEmitter.value && verticalViewType === 1,
     }"
   >
@@ -103,7 +104,8 @@ export default class LogRecordComponent extends Vue {
   margin-top: 5px;
   padding: 5px;
   transition: all 0.2s ease-in-out;
-  &.sideBarIsOpened {
+  &.sideBarIsOpened,
+  &.isVerticalView {
     width: 100%;
   }
   &.expanded {
