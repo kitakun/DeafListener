@@ -29,14 +29,13 @@ import Loader from "@/components/layout/Loader.vue";
 // services
 import LogsService from "@/services/LogsService";
 import MapService from "@/services/MapService";
-import SettingsService, {
-  Header_LogDirectionViewTypeEnum,
-} from "@/services/SettingsService";
+import SettingsService from "@/services/SettingsService";
 // types | utils
 import { DeafLog, DeafScope } from "@/types/FetchModels";
 import { isDebug } from "@/utils/environments";
 import { HubLog, HubScope } from "@/types/HubModels";
 import RxVariable from "@/utils/rx/VariableRx";
+import { Header_LogDirectionViewTypeEnum } from "@/types/SettingEnums";
 
 @Options({
   components: {

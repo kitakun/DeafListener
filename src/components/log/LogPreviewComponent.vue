@@ -48,14 +48,13 @@ import { Options, Vue } from "vue-class-component";
 import { Inject, Prop } from "vue-property-decorator";
 // types
 import { LogPreviewData } from "@/types/LogRenderModels";
-  import { DeafLog, DeafScope } from "@/types/FetchModels";
+import { DeafLog, DeafScope } from "@/types/FetchModels";
+import { Header_LogViewTypeEnum } from "@/types/SettingEnums";
 // components
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogMessageComponent from "@/components/log/LogMessageComponent.vue";
 // services
-import SettingsService, {
-  Header_LogViewTypeEnum,
-} from "@/services/SettingsService";
+import SettingsService from "@/services/SettingsService";
 
 @Options({
   components: {

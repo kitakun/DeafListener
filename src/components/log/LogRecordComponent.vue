@@ -39,9 +39,9 @@ import { formatLogTime } from "@/utils/datetime";
 import RxVariable from "@/utils/rx/VariableRx";
 // types
 import { DeafLog, DeafScope } from "@/types/FetchModels";
+import { Header_LogDirectionViewTypeEnum } from "@/types/SettingEnums";
 // components
 import LogPreviewComponent from "./LogPreviewComponent.vue";
-import { Header_LogDirectionViewTypeEnum } from "@/services/SettingsService";
 
 @Options({
   components: {

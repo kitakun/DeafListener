@@ -25,9 +25,9 @@ export default class RxVariable<T> {
         }
     }
 
-    public on(cb: GenericVoidCallback<T>): emptyCallback {
+    public on(cb: GenericVoidCallback<T>, foceSkipEmitOnSub = false): emptyCallback {
         this._cbs.push(cb);
-        if (this._emitOnSubscribe) {
+        if (!foceSkipEmitOnSub && this._emitOnSubscribe) {
             cb(this.value);
         }
 

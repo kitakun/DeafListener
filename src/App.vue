@@ -7,7 +7,9 @@
         :searchStream="settingsService.searchStream"
         :lookFor="'Search text:'"
       ></SearchBlock>
-      <LogsListComponent :sideBarStateEmitter="sideBarStateEmitter"></LogsListComponent>
+      <LogsListComponent
+        :sideBarStateEmitter="sideBarStateEmitter"
+      ></LogsListComponent>
     </PageBody>
   </SideNav>
 </template>
@@ -24,6 +26,7 @@ import LogsService from "./services/LogsService";
 import MapService from "./services/MapService";
 import SettingsService from "./services/SettingsService";
 import SignalRService from "./services/SignalrService";
+import StorageService from "./services/StorageService";
 // components
 import Header from "@/components/layout/Header.vue";
 import SideNav from "@/components/layout/SideNav.vue";
@@ -49,6 +52,7 @@ export default class App extends Vue {
   @Provide() readonly mapService = new MapService();
   @Provide() readonly settingsService = new SettingsService();
   @Provide() readonly signalRService = new SignalRService();
+  @Provide() readonly storeService = new StorageService();
   @Ref() readonly sidenav!: SideNav;
   public readonly sideBarStateEmitter = new RxVariable<Boolean>(false, true);
 
@@ -64,6 +68,7 @@ export default class App extends Vue {
         }
       })
     );
+    this.settingsService.setStore(this.storeService);
   }
   public async unmounted(): Promise<void> {
     for (const disposable of this.disposables) {

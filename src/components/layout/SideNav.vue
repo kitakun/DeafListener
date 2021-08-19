@@ -57,12 +57,10 @@
 import { Vue } from "vue-class-component";
 import { Inject, Prop, Ref } from "vue-property-decorator";
 // service
-import SettingsService, {
-  Header_LogDirectionViewTypeEnum,
-  Header_LogViewTypeEnum,
-} from "@/services/SettingsService";
+import SettingsService from "@/services/SettingsService";
 // components
 // utils
+import { Header_LogViewTypeEnum, Header_LogDirectionViewTypeEnum } from "@/types/SettingEnums";
 import RxVariable from "@/utils/rx/VariableRx";
 
 interface ITogglable<T> {
