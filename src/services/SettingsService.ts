@@ -21,7 +21,7 @@ export default class SettingsService {
         this.logViewType = new RxVariable<Header_LogViewTypeEnum>(Header_LogViewTypeEnum.ShowAllScopes, true)
         this.logDirectionViewType = new RxVariable<Header_LogDirectionViewTypeEnum>(Header_LogDirectionViewTypeEnum.Grid, true)
         this.searchStream = new RxSource<string>();
-        this.livetypeLoadingStream = new RxVariable<boolean>(true, true);
+        this.livetypeLoadingStream = new RxVariable<boolean>(false, true);
     }
 
     setStore(storeService: StorageService) {

@@ -20,6 +20,7 @@ import { LogPreviewData } from "@/types/LogRenderModels";
 import { DeafLog, DeafScope } from "@/types/FetchModels";
 import { LogLevel } from "@/proto/generated/logi_client_pb";
 
+/* Log message rendering view */
 export default class LogMessageComponent extends Vue {
   // props
   @Prop() public log!: LogPreviewData;

@@ -7,9 +7,15 @@ import { LogPreviewData } from "@/types/LogRenderModels";
 // utils
 import { formatLogTime } from "@/utils/datetime";
 import { toDate } from "@/utils/protos";
+import { sortByCreatedDate, sortByDate, sortByStringDate } from "@/utils/sort";
 
 export default class MapService {
 
+    /**
+     * map grpc JS response to deaf models (log + scopes)
+     * @param jsResp fetch grpc JS object response
+     * @returns Deaf scopes and logs array
+     */
     public mapFetchToClient(jsResp: FetchLogResponse.AsObject): (DeafScope | DeafLog)[] {
         const logsWithoutScope = jsResp
             .logsList
@@ -24,6 +30,11 @@ export default class MapService {
         return [...logsWithoutScope, ...initialScopes];
     }
 
+    /**
+     * Map grpc JS log message to vue-deaf-client model
+     * @param log grpc JS object
+     * @returns mapped DeafLog object
+     */
     public fetchLogToDeafLog(log: LogMessage.AsObject): DeafLog {
         if (log.level !== LogLevel.ERROR) {
             return new DeafLog({
@@ -46,7 +57,8 @@ export default class MapService {
         }
     }
 
-    public fetchScopeToDeafScope(
+    /** map fetchScopeModel to DeafScope */
+    private fetchScopeToDeafScope(
         scope: LogScope.AsObject,
         jsResp: FetchLogResponse.AsObject,
         sortedData?: (LogMessage.AsObject | LogScope.AsObject)[]
@@ -70,13 +82,20 @@ export default class MapService {
             innerScopes: innerScopes
                 .filter(f => f.ownerscopeid === scope.scopeid)
                 .map(inScope => this.fetchScopeToDeafScope(inScope, jsResp, sortedData)),
-            // computed
-            logsBlockPreviev: this.lookForLogsPreview(scope.scopeid, jsResp, sortedData)
         });
+        // computed
+        result.logsBlockPreviev = this.createLogPreviewFor(result);
+
         return result;
     }
 
-    public mapHubScope(hubScope: HubScope, existingData: (DeafScope | DeafLog)[]): (DeafScope | DeafLog)[] {
+    /**
+     * Immutable array operation: add new scope to existing data
+     * @param hubScope new recieved scope
+     * @param existingData exsisting data array
+     * @returns new data array (or same if no changes was applied)
+     */
+    public applyHubScopeToData(hubScope: HubScope, existingData: (DeafScope | DeafLog)[]): (DeafScope | DeafLog)[] {
         if (!hubScope.ownerScopeId || hubScope.ownerScopeId <= 0) {
             // create root scope
             const result = new DeafScope({
@@ -84,10 +103,15 @@ export default class MapService {
                 scopeId: hubScope.id,
                 innerLogs: [],
                 innerScopes: [],
-                logsBlockPreviev: []
+                logsBlockPreviev: [{
+                    createdAt: '-',
+                    isScope: false,
+                    innerLogs: [],
+                    text: 'Empty scope'
+                }]
             });
 
-            return [...existingData, result];
+            return [...existingData, result].sort(sortByCreatedDate);
         } else {
             // create parented scope
             const rootScopeId = hubScope.rootScopeId;
@@ -100,8 +124,9 @@ export default class MapService {
                         innerLogs: [],
                         innerScopes: [],
                         scopeId: hubScope.id,
-                        logsBlockPreviev: [],
+                        logsBlockPreviev: this.createLogPreviewFor(ownerScope),
                     }));
+                    ownerScope.innerScopes = ownerScope.innerScopes.sort(sortByCreatedDate);
                 }
             }
         }
@@ -109,6 +134,12 @@ export default class MapService {
         return existingData;
     }
 
+    /**
+     * Immutable array operation: add new log to existing data
+     * @param hubLog new log data
+     * @param existingData exsisting data array
+     * @returns new data array (or same if no changes was applied)
+     */
     public applyHubLogToData(hubLog: HubLog, existingData: (DeafScope | DeafLog)[]): (DeafScope | DeafLog)[] {
         const rootScopeId = hubLog.rootScopeId;
         const rootScope = existingData.find(f => f instanceof DeafScope && f.scopeId === rootScopeId);
@@ -123,7 +154,8 @@ export default class MapService {
                     createdAt: hubLog.createdAt,
                     parameterMap: [],
                 }));
-                // rootScope.logsBlockPreviev = this.lookForLogsPreview(rootScope.scopeId, jsResp, sortedData)
+                parentScope.logsBlockPreviev = this.createLogPreviewFor(parentScope);
+                rootScope.logsBlockPreviev = this.createLogPreviewFor(rootScope);
                 return newData;
             }
         }
@@ -131,60 +163,14 @@ export default class MapService {
         return existingData;
     }
 
-    private lookForLogsPreview(
-        scopeId: number,
-        rawData: FetchLogResponse.AsObject,
-        sortedData: (LogMessage.AsObject | LogScope.AsObject)[],
-        arrayToAdd?: LogPreviewData[]): LogPreviewData[] {
-
-        const targetScope = rawData?.scopesList?.find(f => f.scopeid === scopeId);
-
-        if (targetScope && sortedData.length) {
-            const sortedScopeData = this.getSortedMessages(targetScope, rawData);
-            const resultLogs: LogPreviewData[] = arrayToAdd || [];
-            for (var i = 0; i < sortedScopeData.length; i++) {
-                const curElement = sortedScopeData[i];
-                if ((curElement as LogScope.AsObject).scopeid) {
-                    const curScopeEl = curElement as LogScope.AsObject;
-
-                    if (curScopeEl.ownerscopeid !== targetScope.scopeid)
-                        continue;
-
-                    const scopeInnerData: LogPreviewData[] = [];
-
-                    // this is scope!
-                    this.lookForLogsPreview(
-                        curScopeEl.scopeid,
-                        rawData,
-                        sortedData,
-                        scopeInnerData
-                    );
-
-                    resultLogs.push({
-                        isScope: true,
-                        text: scopeInnerData.find(f => !f.isScope)?.text ?? '-',
-                        innerLogs: scopeInnerData,
-                        createdAt: formatLogTime(toDate(curScopeEl.createdat))
-                    } as LogPreviewData);
-
-                } else {
-                    // this is log msg
-                    const logMsg = curElement as LogMessage.AsObject;
-                    resultLogs.push({
-                        id: logMsg.logid,
-                        isScope: false,
-                        text: logMsg.message,
-                        createdAt: formatLogTime(toDate(logMsg.createdat)),
-                        isException: !!logMsg.exceptiontitle
-                    } as LogPreviewData);
-                }
-            }
-            return resultLogs;
-        }
-        return [];
-    }
-
-    /* get all messages (scopes and logs) sorted by created date */
+    /**
+     * Get all protoJS messages (scopes and logs) sorted by created date
+     * @param scope 
+     * @param jsResp raw proto JS response
+     * @param innerLogs preloaded inner logs of the scope (if null - will be loaded from jsResp, this parameter created for optimization and reusability)
+     * @param innerScopes 
+     * @returns raw protoJS messages (scopes and logs) sorted by created date
+     */
     private getSortedMessages(
         scope: LogScope.AsObject,
         jsResp: FetchLogResponse.AsObject,
@@ -208,16 +194,15 @@ export default class MapService {
             innerScope.scopeid
         }
 
-        return mergetScopesNlogs.sort((x, y) => {
-            const dateA = toDate(x.createdat);
-            const dateB = toDate(y.createdat);
-            if (dateA < dateB)
-                return -1;
-            if (dateA > dateB) return 1;
-            return 0;
-        });
+        return mergetScopesNlogs.sort((a, b) => sortByDate(toDate(a.createdat), toDate(b.createdat)));
     }
 
+    /**
+     * Get owner scope for scopeId
+     * @param scopeId scope ID for which we will look a parent
+     * @param rootScope initial root scope
+     * @returns parent scope
+     */
     private lookForOwnerScope(scopeId: number, rootScope: DeafScope): DeafScope | null {
         if (rootScope.scopeId === scopeId) {
             return rootScope;
@@ -235,5 +220,57 @@ export default class MapService {
         }
 
         return null;
+    }
+
+    /**
+     * Update rendering information for scope
+     * @param forScope scope
+     * @returns new array of rendering information
+     */
+    private createLogPreviewFor(forScope: DeafScope): LogPreviewData[] {
+        const getPreview = (inForScope: DeafScope): LogPreviewData[] | null => {
+            let inPrev: LogPreviewData[] | null = null;
+            if (inForScope.innerLogs.length > 0 || inForScope.innerScopes.length > 0) {
+                const logsAndScopes = [...inForScope.innerLogs, ...inForScope.innerScopes].sort(sortByCreatedDate);
+                for (const data of logsAndScopes) {
+                    if (data instanceof DeafLog) {
+                        if (!inPrev) {
+                            inPrev = [];
+                        }
+                        inPrev.push({
+                            isScope: false,
+                            createdAt: formatLogTime(data.createdAt),
+                            id: data.logId,
+                            innerLogs: [],
+                            // TODO exception support
+                            isException: false,
+                            text: data.message,
+                        });
+                    } else if (data instanceof DeafScope) {
+                        const inner = getPreview(data);
+                        if (inner) {
+                            const scopeOwner = {
+                                isScope: true,
+                                text: inner.find(f => !f.isScope)?.text ?? '-',
+                                innerLogs: inner,
+                                createdAt: formatLogTime(data.createdAt)
+                            } as LogPreviewData;
+                            if (!inPrev) {
+                                inPrev = [scopeOwner];
+                            } else {
+                                inPrev.push(scopeOwner);
+                            }
+                        }
+                    }
+                }
+            }
+            return inPrev;
+        };
+        const rslt = getPreview(forScope);
+        if (rslt) {
+            rslt.sort(sortByStringDate);
+            return rslt;
+        }
+        return [];
     }
 }

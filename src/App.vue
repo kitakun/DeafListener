@@ -36,6 +36,9 @@ import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
 import RxVariable from "./utils/rx/VariableRx";
+import { isDebug } from "./utils/environments";
+import { HubLog, HubScope } from "./types/HubModels";
+import { LogLevel } from "./proto/generated/logi_client_pb";
 
 @Options({
   components: {
@@ -64,7 +67,7 @@ export default class App extends Vue {
         if (isEnabled) {
           this.signalRService.connect(this.logsService.logsStream);
         } else {
-          this.signalRService.disconnect();
+          this.signalRService.disconnect(true);
         }
       })
     );
@@ -75,7 +78,7 @@ export default class App extends Vue {
       disposable();
     }
     this.disposables.length = 0;
-    await this.signalRService.disconnect();
+    await this.signalRService.disconnect(true);
   }
 }
 </script>

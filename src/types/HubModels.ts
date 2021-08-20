@@ -1,4 +1,5 @@
 import { LogLevel } from "@/proto/generated/logi_client_pb";
+import { formatLogTime } from "@/utils/datetime";
 
 export class HubLog {
     public createdAt: Date;
@@ -33,7 +34,12 @@ export class HubScope {
 
     constructor(data: Partial<HubScope>) {
         this.id = data.id ?? 0;
-        this.createdAt = data.createdAt ?? new Date();
+        const dateFromParams = data.createdAt;
+        if (typeof dateFromParams === 'string') {
+            this.createdAt = new Date(Date.parse(dateFromParams));
+        } else {
+            this.createdAt = data.createdAt ?? new Date();
+        }
         this.rootScopeId = data.rootScopeId ?? -2;
         this.ownerScopeId = data.ownerScopeId ?? -2;
         this.project = data.project ?? '-';

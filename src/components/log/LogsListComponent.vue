@@ -94,7 +94,10 @@ export default class LogsListComponent extends Vue {
 
   private realtimeUpdate(newLog: HubLog | HubScope): void {
     if (newLog instanceof HubScope) {
-      this.fetchetData = this.mapService.mapHubScope(newLog, this.fetchetData);
+      this.fetchetData = this.mapService.applyHubScopeToData(
+        newLog,
+        this.fetchetData
+      );
     } else if (newLog instanceof HubLog) {
       this.fetchetData = this.mapService.applyHubLogToData(
         newLog,
