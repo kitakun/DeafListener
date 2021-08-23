@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "/precache-manifest.c20a0de36902f88ea3bb836df49f3529.js"
+  "/precache-manifest.13b2332d3e56b2684f979bd1bb0db4ad.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "vue-deaf-logger-client"});
