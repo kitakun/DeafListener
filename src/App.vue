@@ -36,9 +36,7 @@ import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
 import RxVariable from "./utils/rx/VariableRx";
-import { isDebug } from "./utils/environments";
 import { HubLog, HubScope } from "./types/HubModels";
-import { LogLevel } from "./proto/generated/logi_client_pb";
 
 @Options({
   components: {
@@ -178,5 +176,22 @@ input[type="checkbox"] {
   height: 24px;
   position: relative;
   top: 6px;
+}
+
+/* vue - animations */
+.slide-fade-enter-active {
+  transition: all 0.1s ease !important;
+  opacity: 0 !important;
+  transform: scale(0.9);
+  background-color: #72c7d6;
+}
+.slide-fade-leave-active {
+  transition: all 0.1s cubic-bezier(1, 0.5, 0.8, 1) !important;
+}
+.slide-fade-enter,
+.slide-fade-leave-to {
+  opacity: 0 !important;
+  transform: translateY(400) !important;
+  transform: scale(0.9);
 }
 </style>

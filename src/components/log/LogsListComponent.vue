@@ -7,14 +7,16 @@
       vertical: verticalViewType === 1,
     }"
   >
-    <LogRecordComponent
-      v-for="(item, index) in fetchetData"
-      :log="item"
-      :sharedData="fetchetData"
-      :sideBarStateEmitter="sideBarStateEmitter"
-      :verticalViewType="verticalViewType"
-      :key="index"
-    ></LogRecordComponent>
+    <transition-group name="slide-fade">
+      <LogRecordComponent
+        v-for="item in fetchetData"
+        :log="item"
+        :key="item?.logId ?? item?.scopeId"
+        :sharedData="fetchetData"
+        :sideBarStateEmitter="sideBarStateEmitter"
+        :verticalViewType="verticalViewType"
+      ></LogRecordComponent>
+    </transition-group>
   </div>
   <div v-else>empty :c</div>
   <div v-if="isLoading"><Loader></Loader></div>

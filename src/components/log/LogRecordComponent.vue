@@ -103,6 +103,7 @@ export default class LogRecordComponent extends Vue {
   margin-right: 5px;
   margin-top: 5px;
   padding: 5px;
+  opacity: 1;
   transition: all 0.2s ease-in-out;
   &.sideBarIsOpened,
   &.isVerticalView {

@@ -23,20 +23,26 @@
 </template>
 
 <script lang="ts">
-import RxVariable from "@/utils/rx/VariableRx";
+import RxSource from "@/utils/rx/SourceRx";
 import { Vue } from "vue-class-component";
 import { Prop } from "vue-property-decorator";
 
 export default class SearchBlock extends Vue {
   @Prop() lookFor!: string;
   @Prop() isBusy = false;
-  @Prop() searchStream?: RxVariable<string>;
+  @Prop() searchStream?: RxSource<string>;
 
   public searchQuery: string = "";
+  private lastQuery: string = "";
 
   public search(): void {
-    if (this.searchStream && this.searchQuery) {
-      this.searchStream.setValue(this.searchQuery);
+    if (
+      this.searchStream &&
+      typeof this.searchQuery === "string" &&
+      this.lastQuery !== this.searchQuery
+    ) {
+      this.lastQuery = this.searchQuery;
+      this.searchStream.emit(this.searchQuery);
     }
   }
 }
