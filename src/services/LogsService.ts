@@ -1,6 +1,6 @@
 // grpc
 import { LoggerClientClient } from '@/proto/generated/Logi_clientServiceClientPb';
-import { FetchLogRequest, PingRequest } from "@/proto/generated/logi_client_pb";
+import { FetchLogRequest, HelloRequest, PingRequest } from "@/proto/generated/logi_client_pb";
 // types
 import { DeafLog, DeafScope } from '@/types/FetchModels';
 import { HubLog, HubScope } from '@/types/HubModels';
@@ -30,6 +30,16 @@ export default class LogsService {
         return false;
     }
 
+    public async Hello(): Promise<any> {
+        try {
+            const response = await this._client.hello(new HelloRequest(), null);
+            return response.toObject();
+        } catch {
+
+        }
+        return null;
+    }
+
     public async fetch(from?: number, searchQuery?: string): Promise<(DeafScope | DeafLog)[]> {
         const request = new FetchLogRequest();
         if (from) {
@@ -39,7 +49,7 @@ export default class LogsService {
             request.setQuery(searchQuery);
         }
 
-        const resp = await this._client.fetch(request, {  });
+        const resp = await this._client.fetch(request, {});
         const jsResp = resp.toObject();
 
         if (jsResp.issuccess) {

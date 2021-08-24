@@ -38,9 +38,7 @@ export default class SignalRService {
                 this._logStream?.emit(new HubScope(data));
             });
 
-            this._client.onclose(async () => {
-                await this.reconnect();
-            });
+
 
             this._client
                 .start()
@@ -48,10 +46,29 @@ export default class SignalRService {
                     if (isDebug()) {
                         console.debug('SignalR: connected!');
                     }
-                });
+                    this._client!.invoke("IsAllowed").then(resp => {
+                        if (typeof resp === 'boolean') {
+                            if (resp) {
+                                if (isDebug()) {
+                                    console.debug('SignalR: connected and allowed!');
+                                }
+                                // allowed
+                                this?._client?.onclose(async () => {
+                                    await this.reconnect();
+                                });
+                            } else {
+                                if (isDebug()) {
+                                    console.debug('SignalR: connected but not allowed!');
+                                }
+                                // not allowed
+                                this.disconnect(true);
+                            }
+                        }
+                    });
 
-            // call method in hub
-            //.then(() => this._client!.invoke("Hi", "Hello"))
+                }).catch((reason) => {
+                    console.error(reason);
+                });
         } else if (isDebug()) {
             console.debug('SignalR: already connected, skip..');
         }

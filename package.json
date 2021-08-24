@@ -4,8 +4,8 @@
     "private": true,
     "scripts": {
         "serve": "vue-cli-service serve",
-        "git": "(set NODE_ENV=github) && vue-cli-service build --dest ./docs",
-        "build": "vue-cli-service build --dest ./azure-dist",
+        "git": "(set NODE_ENV=github) && vue-cli-service build --dest ./docs --mode prod",
+        "build": "vue-cli-service build --dest ./azure-dist --mode prod",
         "generate": "node regenerateProtos.js"
     },
     "dependencies": {

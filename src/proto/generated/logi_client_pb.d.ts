@@ -3,6 +3,64 @@ import * as jspb from 'google-protobuf'
 import * as google_protobuf_timestamp_pb from 'google-protobuf/google/protobuf/timestamp_pb';
 
 
+export class MapFieldStringEntry extends jspb.Message {
+  getKey(): string;
+  setKey(value: string): MapFieldStringEntry;
+
+  getValueList(): Array<string>;
+  setValueList(value: Array<string>): MapFieldStringEntry;
+  clearValueList(): MapFieldStringEntry;
+  addValue(value: string, index?: number): MapFieldStringEntry;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MapFieldStringEntry.AsObject;
+  static toObject(includeInstance: boolean, msg: MapFieldStringEntry): MapFieldStringEntry.AsObject;
+  static serializeBinaryToWriter(message: MapFieldStringEntry, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MapFieldStringEntry;
+  static deserializeBinaryFromReader(message: MapFieldStringEntry, reader: jspb.BinaryReader): MapFieldStringEntry;
+}
+
+export namespace MapFieldStringEntry {
+  export type AsObject = {
+    key: string,
+    valueList: Array<string>,
+  }
+}
+
+export class HelloRequest extends jspb.Message {
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): HelloRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: HelloRequest): HelloRequest.AsObject;
+  static serializeBinaryToWriter(message: HelloRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): HelloRequest;
+  static deserializeBinaryFromReader(message: HelloRequest, reader: jspb.BinaryReader): HelloRequest;
+}
+
+export namespace HelloRequest {
+  export type AsObject = {
+  }
+}
+
+export class HelloResponse extends jspb.Message {
+  getEnvsToProjectsList(): Array<MapFieldStringEntry>;
+  setEnvsToProjectsList(value: Array<MapFieldStringEntry>): HelloResponse;
+  clearEnvsToProjectsList(): HelloResponse;
+  addEnvsToProjects(value?: MapFieldStringEntry, index?: number): MapFieldStringEntry;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): HelloResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: HelloResponse): HelloResponse.AsObject;
+  static serializeBinaryToWriter(message: HelloResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): HelloResponse;
+  static deserializeBinaryFromReader(message: HelloResponse, reader: jspb.BinaryReader): HelloResponse;
+}
+
+export namespace HelloResponse {
+  export type AsObject = {
+    envsToProjectsList: Array<MapFieldStringEntry.AsObject>,
+  }
+}
+
 export class PingRequest extends jspb.Message {
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PingRequest.AsObject;

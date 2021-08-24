@@ -75,6 +75,46 @@ export class LoggerClientClient {
     this.methodInfoPing);
   }
 
+  methodInfoHello = new grpcWeb.AbstractClientBase.MethodInfo(
+    logi_client_pb.HelloResponse,
+    (request: logi_client_pb.HelloRequest) => {
+      return request.serializeBinary();
+    },
+    logi_client_pb.HelloResponse.deserializeBinary
+  );
+
+  hello(
+    request: logi_client_pb.HelloRequest,
+    metadata: grpcWeb.Metadata | null): Promise<logi_client_pb.HelloResponse>;
+
+  hello(
+    request: logi_client_pb.HelloRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback: (err: grpcWeb.Error,
+               response: logi_client_pb.HelloResponse) => void): grpcWeb.ClientReadableStream<logi_client_pb.HelloResponse>;
+
+  hello(
+    request: logi_client_pb.HelloRequest,
+    metadata: grpcWeb.Metadata | null,
+    callback?: (err: grpcWeb.Error,
+               response: logi_client_pb.HelloResponse) => void) {
+    if (callback !== undefined) {
+      return this.client_.rpcCall(
+        this.hostname_ +
+          '/logiClient.LoggerClient/Hello',
+        request,
+        metadata || {},
+        this.methodInfoHello,
+        callback);
+    }
+    return this.client_.unaryCall(
+    this.hostname_ +
+      '/logiClient.LoggerClient/Hello',
+    request,
+    metadata || {},
+    this.methodInfoHello);
+  }
+
   methodInfoFetch = new grpcWeb.AbstractClientBase.MethodInfo(
     logi_client_pb.FetchLogResponse,
     (request: logi_client_pb.FetchLogRequest) => {

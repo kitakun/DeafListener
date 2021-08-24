@@ -59,16 +59,21 @@ export default class App extends Vue {
 
   private disposables: (() => void)[] = [];
 
-  public mounted(): void {
-    this.disposables.push(
-      this.settingsService.livetypeLoadingStream.on((isEnabled) => {
-        if (isEnabled) {
-          this.signalRService.connect(this.logsService.logsStream);
-        } else {
-          this.signalRService.disconnect(true);
-        }
-      })
-    );
+  public async mounted(): Promise<void> {
+    const projectsInfo = await this.logsService.Hello();
+    if (projectsInfo) {
+      console.log('get hello', projectsInfo);
+      // connect live-updates only if we connected to server
+      this.disposables.push(
+        this.settingsService.livetypeLoadingStream.on((isEnabled) => {
+          if (isEnabled) {
+            this.signalRService.connect(this.logsService.logsStream);
+          } else {
+            this.signalRService.disconnect(true);
+          }
+        })
+      );
+    }
     this.settingsService.setStore(this.storeService);
   }
   public async unmounted(): Promise<void> {
