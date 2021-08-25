@@ -2,7 +2,7 @@
 import { LoggerClientClient } from '@/proto/generated/Logi_clientServiceClientPb';
 import { FetchLogRequest, HelloRequest, PingRequest } from "@/proto/generated/logi_client_pb";
 // types
-import { DeafLog, DeafScope } from '@/types/FetchModels';
+import { DeafLog, DeafScope, IHelloObject } from '@/types/FetchModels';
 import { HubLog, HubScope } from '@/types/HubModels';
 // services
 import { APP_VARS, isDebug } from '@/utils/environments';
@@ -30,7 +30,7 @@ export default class LogsService {
         return false;
     }
 
-    public async Hello(): Promise<any> {
+    public async Hello(): Promise<IHelloObject | null> {
         try {
             const response = await this._client.hello(new HelloRequest(), null);
             return response.toObject();

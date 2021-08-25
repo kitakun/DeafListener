@@ -51,3 +51,7 @@ export class DeafExceptionLog extends DeafLog {
         this.exceptionTitle = data?.exceptionTitle || '';
     }
 }
+
+export interface IHelloObject {
+    envsToProjectsList: { key: string, valueList: string[] }[]
+}

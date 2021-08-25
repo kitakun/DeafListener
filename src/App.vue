@@ -29,14 +29,14 @@ import SignalRService from "./services/SignalrService";
 import StorageService from "./services/StorageService";
 // components
 import Header from "@/components/layout/Header.vue";
-import SideNav from "@/components/layout/SideNav.vue";
+import SideNav from "@/components/settings/SideNav.vue";
 import PageBody from "@/components/layout/PageBody.vue";
 import SearchBlock from "@/components/layout/SearchBlock.vue";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
 import RxVariable from "./utils/rx/VariableRx";
-import { HubLog, HubScope } from "./types/HubModels";
+import { IEnvsToProjects } from "./types/SettingsModels";
 
 @Options({
   components: {
@@ -62,7 +62,12 @@ export default class App extends Vue {
   public async mounted(): Promise<void> {
     const projectsInfo = await this.logsService.Hello();
     if (projectsInfo) {
-      console.log('get hello', projectsInfo);
+      // pass envs + projects to services
+      const envsToProjsMap = {} as IEnvsToProjects;
+      projectsInfo.envsToProjectsList.forEach((f) => {
+        envsToProjsMap[f.key] = f.valueList;
+      });
+      this.settingsService.allEnvsWithProjectsStream.setValue(envsToProjsMap);
       // connect live-updates only if we connected to server
       this.disposables.push(
         this.settingsService.livetypeLoadingStream.on((isEnabled) => {

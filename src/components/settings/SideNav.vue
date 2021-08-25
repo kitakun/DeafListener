@@ -9,6 +9,7 @@
           type="checkbox"
         />
       </div>
+      <EnvSelector></EnvSelector>
       <div class="setting-block">
         <span>Logs view type:</span>
         <ul class="tab">
@@ -54,13 +55,17 @@
 
 <script lang="ts">
 // vue stuff
-import { Vue } from "vue-class-component";
+import { Options, Vue } from "vue-class-component";
 import { Inject, Prop, Ref } from "vue-property-decorator";
 // service
 import SettingsService from "@/services/SettingsService";
 // components
+import EnvSelector from "./EnvSelector.vue";
 // utils
-import { Header_LogViewTypeEnum, Header_LogDirectionViewTypeEnum } from "@/types/SettingEnums";
+import {
+  Header_LogViewTypeEnum,
+  Header_LogDirectionViewTypeEnum,
+} from "@/types/SettingEnums";
 import RxVariable from "@/utils/rx/VariableRx";
 
 interface ITogglable<T> {
@@ -69,13 +74,20 @@ interface ITogglable<T> {
   value: T;
 }
 
+@Options({
+  components: {
+    EnvSelector,
+  },
+})
 export default class SideNav extends Vue {
-  public isOpened = false;
+  // props, refs, injs
   @Ref() sidenavRoot!: HTMLDivElement;
-  @Prop() sidebarEmitter!: RxVariable<Boolean>;
-  private disposables: (() => void)[] = [];
-  //
+  @Prop() sidebarEmitter!: RxVariable<boolean>;
   @Inject() settingsService!: SettingsService;
+  // vars
+  public isOpened = false;
+  private disposables: (() => void)[] = [];
+  // computed
   public get isLivetimeEnabled(): boolean {
     if (this.settingsService && this.settingsService.livetypeLoadingStream) {
       return this.settingsService.livetypeLoadingStream.value;
@@ -89,11 +101,6 @@ export default class SideNav extends Vue {
       active: true,
       value: Header_LogViewTypeEnum.ShowAllScopes,
     },
-    // {
-    //   text: "Root scopes",
-    //   active: false,
-    //   value: Header_LogViewTypeEnum.ShowOnlyMainScope,
-    // },
     {
       text: "Default logs",
       active: false,
@@ -120,11 +127,7 @@ export default class SideNav extends Vue {
     {
       this.disposables.push(
         this.sidebarEmitter.on((newState) => {
-          if (newState) {
-            this.open();
-          } else {
-            this.close();
-          }
+          this.setSidebarState(newState);
         })
       );
     }
@@ -178,15 +181,8 @@ export default class SideNav extends Vue {
     this.settingsService.logViewType.setValue(item.value);
   }
   // sidebar toggle
-  public open(): void {
-    this.isOpened = true;
-    this.applyState();
-  }
-  public close(): void {
-    this.isOpened = false;
-    this.applyState();
-  }
-  private applyState(): void {
+  public setSidebarState(newState: boolean): void {
+    this.isOpened = newState;
     this.sidenavRoot.style.width = this.isOpened ? "250px" : "0px";
   }
 }
@@ -230,13 +226,5 @@ export default class SideNav extends Vue {
       margin-left: 50px;
     }
   }
-}
-.setting-block {
-  padding: 4px;
-  margin: 4px;
-  border: 1px solid #d8d8d8;
-  border-radius: 4px;
-  min-height: 65px;
-  min-width: 235px;
 }
 </style>

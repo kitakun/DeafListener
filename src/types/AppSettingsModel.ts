@@ -4,4 +4,5 @@ export interface AppSettingsData {
     enableLive: boolean;
     logViewType: Header_LogViewTypeEnum;
     logDirectionType: Header_LogDirectionViewTypeEnum;
+    selectedEnvs: string[];
 }
