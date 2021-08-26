@@ -72,7 +72,31 @@ export default class LogsListComponent extends Vue {
     this.disposables.push(
       this.settingsService.searchStream.on((searchQuery: string) => {
         this.searchQuery = searchQuery;
-        this.fetchLogsAndRender(searchQuery);
+        this.fetchLogsAndRender(
+          this.searchQuery,
+          this.settingsService.selectedEnvStream.value,
+          this.settingsService.selectedProjectStream.value
+        );
+      })
+    );
+
+    this.disposables.push(
+      this.settingsService.selectedProjectStream.on((selectedProjects: string[]) => {
+        this.fetchLogsAndRender(
+          this.searchQuery,
+          this.settingsService.selectedEnvStream.value,
+          this.settingsService.selectedProjectStream.value
+        );
+      })
+    );
+
+     this.disposables.push(
+      this.settingsService.selectedEnvStream.on((selectedEnvs: string[]) => {
+        this.fetchLogsAndRender(
+          this.searchQuery,
+          this.settingsService.selectedEnvStream.value,
+          this.settingsService.selectedProjectStream.value
+        );
       })
     );
 
@@ -82,7 +106,11 @@ export default class LogsListComponent extends Vue {
       })
     );
 
-    await this.fetchLogsAndRender();
+    await this.fetchLogsAndRender(
+      void 0,
+      this.settingsService.selectedEnvStream.value,
+      this.settingsService.selectedProjectStream.value
+    );
   }
 
   public unmounted(): void {
@@ -108,11 +136,19 @@ export default class LogsListComponent extends Vue {
     }
   }
 
-  private async fetchLogsAndRender(searchQuery?: string): Promise<void> {
+  private async fetchLogsAndRender(
+    searchQuery?: string,
+    selectedEnvs?: string[],
+    selectedProjects?: string[]
+  ): Promise<void> {
     this.isLoading = true;
     try {
       if (await this.logsService.ping()) {
-        const loadedData = await this.logsService.fetch(void 0, searchQuery);
+        const loadedData = await this.logsService.fetch(void 0, {
+          searchQuery: searchQuery,
+          selectedEnvs: selectedEnvs,
+          selectedProjects: selectedProjects,
+        });
         // remove logs withoud scopes and scopes without logs
         this.fetchetData = loadedData.filter(
           (f) => f instanceof DeafScope && f.logsBlockPreviev.length > 0

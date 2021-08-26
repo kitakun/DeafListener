@@ -28,6 +28,7 @@ message MapFieldStringEntry {
 message HelloRequest { }
 message HelloResponse {
 	repeated MapFieldStringEntry envs_to_projects = 1;
+	string databaseSize = 2;
 }
 
 // ping-pong-request
@@ -67,6 +68,8 @@ message FetchLogRequest {
 	string query = 2;
 	google.protobuf.Timestamp fromDate = 3;
 	google.protobuf.Timestamp toDate = 4;
+	repeated string enves = 5;
+	repeated string projects = 6;
 }
 
 message FetchLogResponse {

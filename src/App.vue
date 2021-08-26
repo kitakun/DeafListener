@@ -37,6 +37,7 @@ import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
 import RxVariable from "./utils/rx/VariableRx";
 import { IEnvsToProjects } from "./types/SettingsModels";
+import { isDebug } from "./utils/environments";
 
 @Options({
   components: {
@@ -62,6 +63,9 @@ export default class App extends Vue {
   public async mounted(): Promise<void> {
     const projectsInfo = await this.logsService.Hello();
     if (projectsInfo) {
+      if (isDebug()) {
+        console.log(`DB Size=${projectsInfo.databasesize}`);
+      }
       // pass envs + projects to services
       const envsToProjsMap = {} as IEnvsToProjects;
       projectsInfo.envsToProjectsList.forEach((f) => {

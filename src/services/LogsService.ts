@@ -40,14 +40,23 @@ export default class LogsService {
         return null;
     }
 
-    public async fetch(from?: number, searchQuery?: string): Promise<(DeafScope | DeafLog)[]> {
+    public async fetch(from?: number, filters?: { searchQuery?: string, selectedEnvs?: string[], selectedProjects?: string[] }): Promise<(DeafScope | DeafLog)[]> {
         const request = new FetchLogRequest();
         if (from) {
             request.setFrom(from);
         }
-        if (searchQuery) {
-            request.setQuery(searchQuery);
+        if (filters) {
+            if (filters.searchQuery) {
+                request.setQuery(filters.searchQuery);
+            }
+            if (filters.selectedEnvs && filters.selectedEnvs.length) {
+                request.setEnvesList(filters.selectedEnvs);
+            }
+            if (filters.selectedProjects && filters.selectedProjects.length) {
+                request.setProjectsList(filters.selectedProjects);
+            }
         }
+
 
         const resp = await this._client.fetch(request, {});
         const jsResp = resp.toObject();

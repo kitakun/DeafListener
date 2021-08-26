@@ -47,6 +47,9 @@ export class HelloResponse extends jspb.Message {
   clearEnvsToProjectsList(): HelloResponse;
   addEnvsToProjects(value?: MapFieldStringEntry, index?: number): MapFieldStringEntry;
 
+  getDatabasesize(): string;
+  setDatabasesize(value: string): HelloResponse;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): HelloResponse.AsObject;
   static toObject(includeInstance: boolean, msg: HelloResponse): HelloResponse.AsObject;
@@ -58,6 +61,7 @@ export class HelloResponse extends jspb.Message {
 export namespace HelloResponse {
   export type AsObject = {
     envsToProjectsList: Array<MapFieldStringEntry.AsObject>,
+    databasesize: string,
   }
 }
 
@@ -186,6 +190,16 @@ export class FetchLogRequest extends jspb.Message {
   hasTodate(): boolean;
   clearTodate(): FetchLogRequest;
 
+  getEnvesList(): Array<string>;
+  setEnvesList(value: Array<string>): FetchLogRequest;
+  clearEnvesList(): FetchLogRequest;
+  addEnves(value: string, index?: number): FetchLogRequest;
+
+  getProjectsList(): Array<string>;
+  setProjectsList(value: Array<string>): FetchLogRequest;
+  clearProjectsList(): FetchLogRequest;
+  addProjects(value: string, index?: number): FetchLogRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): FetchLogRequest.AsObject;
   static toObject(includeInstance: boolean, msg: FetchLogRequest): FetchLogRequest.AsObject;
@@ -200,6 +214,8 @@ export namespace FetchLogRequest {
     query: string,
     fromdate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     todate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
+    envesList: Array<string>,
+    projectsList: Array<string>,
   }
 }
 

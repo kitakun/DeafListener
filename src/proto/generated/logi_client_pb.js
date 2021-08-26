@@ -182,7 +182,7 @@ if (goog.DEBUG && !COMPILED) {
  * @constructor
  */
 proto.logiClient.FetchLogRequest = function(opt_data) {
-  jspb.Message.initialize(this, opt_data, 0, -1, null, null);
+  jspb.Message.initialize(this, opt_data, 0, -1, proto.logiClient.FetchLogRequest.repeatedFields_, null);
 };
 goog.inherits(proto.logiClient.FetchLogRequest, jspb.Message);
 if (goog.DEBUG && !COMPILED) {
@@ -540,7 +540,8 @@ proto.logiClient.HelloResponse.prototype.toObject = function(opt_includeInstance
 proto.logiClient.HelloResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     envsToProjectsList: jspb.Message.toObjectList(msg.getEnvsToProjectsList(),
-    proto.logiClient.MapFieldStringEntry.toObject, includeInstance)
+    proto.logiClient.MapFieldStringEntry.toObject, includeInstance),
+    databasesize: jspb.Message.getFieldWithDefault(msg, 2, "")
   };
 
   if (includeInstance) {
@@ -582,6 +583,10 @@ proto.logiClient.HelloResponse.deserializeBinaryFromReader = function(msg, reade
       reader.readMessage(value,proto.logiClient.MapFieldStringEntry.deserializeBinaryFromReader);
       msg.addEnvsToProjects(value);
       break;
+    case 2:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setDatabasesize(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -617,6 +622,13 @@ proto.logiClient.HelloResponse.serializeBinaryToWriter = function(message, write
       1,
       f,
       proto.logiClient.MapFieldStringEntry.serializeBinaryToWriter
+    );
+  }
+  f = message.getDatabasesize();
+  if (f.length > 0) {
+    writer.writeString(
+      2,
+      f
     );
   }
 };
@@ -657,6 +669,24 @@ proto.logiClient.HelloResponse.prototype.addEnvsToProjects = function(opt_value,
  */
 proto.logiClient.HelloResponse.prototype.clearEnvsToProjectsList = function() {
   return this.setEnvsToProjectsList([]);
+};
+
+
+/**
+ * optional string databaseSize = 2;
+ * @return {string}
+ */
+proto.logiClient.HelloResponse.prototype.getDatabasesize = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 2, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.logiClient.HelloResponse} returns this
+ */
+proto.logiClient.HelloResponse.prototype.setDatabasesize = function(value) {
+  return jspb.Message.setProto3StringField(this, 2, value);
 };
 
 
@@ -1468,6 +1498,13 @@ proto.logiClient.LogMessage.prototype.setLogid = function(value) {
 
 
 
+/**
+ * List of repeated fields within this message type.
+ * @private {!Array<number>}
+ * @const
+ */
+proto.logiClient.FetchLogRequest.repeatedFields_ = [5,6];
+
 
 
 if (jspb.Message.GENERATE_TO_OBJECT) {
@@ -1502,7 +1539,9 @@ proto.logiClient.FetchLogRequest.toObject = function(includeInstance, msg) {
     from: jspb.Message.getFieldWithDefault(msg, 1, 0),
     query: jspb.Message.getFieldWithDefault(msg, 2, ""),
     fromdate: (f = msg.getFromdate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
-    todate: (f = msg.getTodate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f)
+    todate: (f = msg.getTodate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
+    envesList: (f = jspb.Message.getRepeatedField(msg, 5)) == null ? undefined : f,
+    projectsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f
   };
 
   if (includeInstance) {
@@ -1556,6 +1595,14 @@ proto.logiClient.FetchLogRequest.deserializeBinaryFromReader = function(msg, rea
       var value = new google_protobuf_timestamp_pb.Timestamp;
       reader.readMessage(value,google_protobuf_timestamp_pb.Timestamp.deserializeBinaryFromReader);
       msg.setTodate(value);
+      break;
+    case 5:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addEnves(value);
+      break;
+    case 6:
+      var value = /** @type {string} */ (reader.readString());
+      msg.addProjects(value);
       break;
     default:
       reader.skipField();
@@ -1614,6 +1661,20 @@ proto.logiClient.FetchLogRequest.serializeBinaryToWriter = function(message, wri
       4,
       f,
       google_protobuf_timestamp_pb.Timestamp.serializeBinaryToWriter
+    );
+  }
+  f = message.getEnvesList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      5,
+      f
+    );
+  }
+  f = message.getProjectsList();
+  if (f.length > 0) {
+    writer.writeRepeatedString(
+      6,
+      f
     );
   }
 };
@@ -1726,6 +1787,80 @@ proto.logiClient.FetchLogRequest.prototype.clearTodate = function() {
  */
 proto.logiClient.FetchLogRequest.prototype.hasTodate = function() {
   return jspb.Message.getField(this, 4) != null;
+};
+
+
+/**
+ * repeated string enves = 5;
+ * @return {!Array<string>}
+ */
+proto.logiClient.FetchLogRequest.prototype.getEnvesList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 5));
+};
+
+
+/**
+ * @param {!Array<string>} value
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.setEnvesList = function(value) {
+  return jspb.Message.setField(this, 5, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.addEnves = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 5, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.clearEnvesList = function() {
+  return this.setEnvesList([]);
+};
+
+
+/**
+ * repeated string projects = 6;
+ * @return {!Array<string>}
+ */
+proto.logiClient.FetchLogRequest.prototype.getProjectsList = function() {
+  return /** @type {!Array<string>} */ (jspb.Message.getRepeatedField(this, 6));
+};
+
+
+/**
+ * @param {!Array<string>} value
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.setProjectsList = function(value) {
+  return jspb.Message.setField(this, 6, value || []);
+};
+
+
+/**
+ * @param {string} value
+ * @param {number=} opt_index
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.addProjects = function(value, opt_index) {
+  return jspb.Message.addToRepeatedField(this, 6, value, opt_index);
+};
+
+
+/**
+ * Clears the list making it empty but non-null.
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.clearProjectsList = function() {
+  return this.setProjectsList([]);
 };
 
 

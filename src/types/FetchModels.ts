@@ -53,5 +53,6 @@ export class DeafExceptionLog extends DeafLog {
 }
 
 export interface IHelloObject {
-    envsToProjectsList: { key: string, valueList: string[] }[]
+    envsToProjectsList: { key: string, valueList: string[] }[];
+    databasesize: string;
 }
