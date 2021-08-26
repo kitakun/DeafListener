@@ -6,7 +6,8 @@
         "serve": "vue-cli-service serve",
         "git": "(set NODE_ENV=github) && vue-cli-service build --dest ./docs --mode prod",
         "build": "vue-cli-service build --dest ./azure-dist --mode prod",
-        "generate": "node regenerateProtos.js"
+        "generate": "node regenerateProtos.js",
+        "release": "npm run git && npm run build"
     },
     "dependencies": {
         "@grpc/proto-loader": "^0.6.4",
