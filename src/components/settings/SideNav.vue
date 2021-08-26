@@ -10,6 +10,7 @@
         />
       </div>
       <EnvSelector></EnvSelector>
+      <ProjSelector></ProjSelector>
       <div class="setting-block">
         <span>Logs view type:</span>
         <ul class="tab">
@@ -61,6 +62,7 @@ import { Inject, Prop, Ref } from "vue-property-decorator";
 import SettingsService from "@/services/SettingsService";
 // components
 import EnvSelector from "./EnvSelector.vue";
+import ProjSelector from "./ProjSelector.vue";
 // utils
 import {
   Header_LogViewTypeEnum,
@@ -77,6 +79,7 @@ interface ITogglable<T> {
 @Options({
   components: {
     EnvSelector,
+    ProjSelector,
   },
 })
 export default class SideNav extends Vue {
