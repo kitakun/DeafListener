@@ -163,7 +163,9 @@ ul.tab {
   border-radius: 5px;
   li {
     float: left;
+    text-align: left;
     padding: 0;
+    white-space: pre;
     label {
       background: white;
       padding: 6px;

@@ -27,7 +27,7 @@ export default class MapService {
             .filter(f => f.ownerscopeid <= 0)
             .map(scope => this.fetchScopeToDeafScope(scope, jsResp));
 
-        return [...logsWithoutScope, ...initialScopes];
+        return [...logsWithoutScope, ...initialScopes].sort(sortByCreatedDate);
     }
 
     /**
