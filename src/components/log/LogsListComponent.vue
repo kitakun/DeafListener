@@ -146,7 +146,8 @@ export default class LogsListComponent extends Vue {
         return false;
       
     } else if (newLog instanceof HubLog) {
-
+      // no filters for logs
+      // because its hard
     }
 
     return true;
