@@ -62,16 +62,18 @@ export default class LogsListComponent extends Vue {
   public async mounted(): Promise<void> {
     this.disposables.push(
       this.logsService.logsStream.on((newLog) => {
-        // we dont load livetime when we make search with query
-        if (this.searchQuery === null || this.searchQuery === void 0) {
-          this.realtimeUpdate(newLog);
-        }
+        
+          // validate fitlers
+          if(this.isLogAcceptFilter(newLog)){
+            this.realtimeUpdate(newLog);
+          }
       })
     );
 
     this.disposables.push(
       this.settingsService.searchStream.on((searchQuery: string) => {
         this.searchQuery = searchQuery;
+        // TODO add multiple protection with timer
         this.fetchLogsAndRender(
           this.searchQuery,
           this.settingsService.selectedEnvStream.value,
@@ -81,17 +83,21 @@ export default class LogsListComponent extends Vue {
     );
 
     this.disposables.push(
-      this.settingsService.selectedProjectStream.on((selectedProjects: string[]) => {
-        this.fetchLogsAndRender(
-          this.searchQuery,
-          this.settingsService.selectedEnvStream.value,
-          this.settingsService.selectedProjectStream.value
-        );
-      })
+      this.settingsService.selectedProjectStream.on(
+        (selectedProjects: string[]) => {
+          // TODO add multiple protection with timer
+          this.fetchLogsAndRender(
+            this.searchQuery,
+            this.settingsService.selectedEnvStream.value,
+            this.settingsService.selectedProjectStream.value
+          );
+        }
+      )
     );
 
-     this.disposables.push(
+    this.disposables.push(
       this.settingsService.selectedEnvStream.on((selectedEnvs: string[]) => {
+        // TODO add multiple protection with timer
         this.fetchLogsAndRender(
           this.searchQuery,
           this.settingsService.selectedEnvStream.value,
@@ -106,11 +112,12 @@ export default class LogsListComponent extends Vue {
       })
     );
 
-    await this.fetchLogsAndRender(
-      void 0,
-      this.settingsService.selectedEnvStream.value,
-      this.settingsService.selectedProjectStream.value
-    );
+    // TODO add multiple protection with timer
+    // await this.fetchLogsAndRender(
+    //   void 0,
+    //   this.settingsService.selectedEnvStream.value,
+    //   this.settingsService.selectedProjectStream.value
+    // );
   }
 
   public unmounted(): void {
@@ -120,6 +127,29 @@ export default class LogsListComponent extends Vue {
       }
       this.disposables.length = 0;
     }
+  }
+
+  private isLogAcceptFilter(newLog: HubLog | HubScope): boolean {
+    // we dont load livetime when we make search with query
+    if (this.searchQuery && this.searchQuery.length)
+        return false;
+
+    if (newLog instanceof HubScope) {
+      const currentSelectedProjects = this.settingsService.selectedProjectStream.value;
+      const currentSelectedEnvs = this.settingsService.selectedEnvStream.value;
+      // not selected project
+      if(currentSelectedProjects.length > 0 && currentSelectedProjects.indexOf(newLog.project) < 0)
+        return false;
+
+      // not selected env
+      if(currentSelectedEnvs.length > 0 && currentSelectedEnvs.indexOf(newLog.environment) < 0)
+        return false;
+      
+    } else if (newLog instanceof HubLog) {
+
+    }
+
+    return true;
   }
 
   private realtimeUpdate(newLog: HubLog | HubScope): void {
@@ -149,6 +179,10 @@ export default class LogsListComponent extends Vue {
           selectedEnvs: selectedEnvs,
           selectedProjects: selectedProjects,
         });
+        if (loadedData.length > 20) {
+          console.log("recieved count", loadedData.length);
+          loadedData.length = 20;
+        }
         // remove logs withoud scopes and scopes without logs
         this.fetchetData = loadedData.filter(
           (f) => f instanceof DeafScope && f.logsBlockPreviev.length > 0

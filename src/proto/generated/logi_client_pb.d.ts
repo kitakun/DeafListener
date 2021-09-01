@@ -200,6 +200,9 @@ export class FetchLogRequest extends jspb.Message {
   clearProjectsList(): FetchLogRequest;
   addProjects(value: string, index?: number): FetchLogRequest;
 
+  getTake(): number;
+  setTake(value: number): FetchLogRequest;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): FetchLogRequest.AsObject;
   static toObject(includeInstance: boolean, msg: FetchLogRequest): FetchLogRequest.AsObject;
@@ -216,6 +219,7 @@ export namespace FetchLogRequest {
     todate?: google_protobuf_timestamp_pb.Timestamp.AsObject,
     envesList: Array<string>,
     projectsList: Array<string>,
+    take: number,
   }
 }
 

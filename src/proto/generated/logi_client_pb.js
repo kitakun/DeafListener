@@ -1541,7 +1541,8 @@ proto.logiClient.FetchLogRequest.toObject = function(includeInstance, msg) {
     fromdate: (f = msg.getFromdate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     todate: (f = msg.getTodate()) && google_protobuf_timestamp_pb.Timestamp.toObject(includeInstance, f),
     envesList: (f = jspb.Message.getRepeatedField(msg, 5)) == null ? undefined : f,
-    projectsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f
+    projectsList: (f = jspb.Message.getRepeatedField(msg, 6)) == null ? undefined : f,
+    take: jspb.Message.getFieldWithDefault(msg, 7, 0)
   };
 
   if (includeInstance) {
@@ -1603,6 +1604,10 @@ proto.logiClient.FetchLogRequest.deserializeBinaryFromReader = function(msg, rea
     case 6:
       var value = /** @type {string} */ (reader.readString());
       msg.addProjects(value);
+      break;
+    case 7:
+      var value = /** @type {number} */ (reader.readInt32());
+      msg.setTake(value);
       break;
     default:
       reader.skipField();
@@ -1674,6 +1679,13 @@ proto.logiClient.FetchLogRequest.serializeBinaryToWriter = function(message, wri
   if (f.length > 0) {
     writer.writeRepeatedString(
       6,
+      f
+    );
+  }
+  f = message.getTake();
+  if (f !== 0) {
+    writer.writeInt32(
+      7,
       f
     );
   }
@@ -1861,6 +1873,24 @@ proto.logiClient.FetchLogRequest.prototype.addProjects = function(value, opt_ind
  */
 proto.logiClient.FetchLogRequest.prototype.clearProjectsList = function() {
   return this.setProjectsList([]);
+};
+
+
+/**
+ * optional int32 take = 7;
+ * @return {number}
+ */
+proto.logiClient.FetchLogRequest.prototype.getTake = function() {
+  return /** @type {number} */ (jspb.Message.getFieldWithDefault(this, 7, 0));
+};
+
+
+/**
+ * @param {number} value
+ * @return {!proto.logiClient.FetchLogRequest} returns this
+ */
+proto.logiClient.FetchLogRequest.prototype.setTake = function(value) {
+  return jspb.Message.setProto3IntField(this, 7, value);
 };
 
 
