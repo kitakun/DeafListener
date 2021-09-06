@@ -62,11 +62,10 @@ export default class LogsListComponent extends Vue {
   public async mounted(): Promise<void> {
     this.disposables.push(
       this.logsService.logsStream.on((newLog) => {
-        
-          // validate fitlers
-          if(this.isLogAcceptFilter(newLog)){
-            this.realtimeUpdate(newLog);
-          }
+        // validate fitlers
+        if (this.isLogAcceptFilter(newLog)) {
+          this.realtimeUpdate(newLog);
+        }
       })
     );
 
@@ -131,20 +130,25 @@ export default class LogsListComponent extends Vue {
 
   private isLogAcceptFilter(newLog: HubLog | HubScope): boolean {
     // we dont load livetime when we make search with query
-    if (this.searchQuery && this.searchQuery.length)
-        return false;
+    if (this.searchQuery && this.searchQuery.length) return false;
 
     if (newLog instanceof HubScope) {
-      const currentSelectedProjects = this.settingsService.selectedProjectStream.value;
+      const currentSelectedProjects =
+        this.settingsService.selectedProjectStream.value;
       const currentSelectedEnvs = this.settingsService.selectedEnvStream.value;
       // not selected project
-      if(currentSelectedProjects.length > 0 && currentSelectedProjects.indexOf(newLog.project) < 0)
+      if (
+        currentSelectedProjects.length > 0 &&
+        currentSelectedProjects.indexOf(newLog.project) < 0
+      )
         return false;
 
       // not selected env
-      if(currentSelectedEnvs.length > 0 && currentSelectedEnvs.indexOf(newLog.environment) < 0)
+      if (
+        currentSelectedEnvs.length > 0 &&
+        currentSelectedEnvs.indexOf(newLog.environment) < 0
+      )
         return false;
-      
     } else if (newLog instanceof HubLog) {
       // no filters for logs
       // because its hard
@@ -164,6 +168,9 @@ export default class LogsListComponent extends Vue {
         newLog,
         this.fetchetData
       );
+    }
+    if (this.fetchetData.length > this.logsService.TakeFetchCount) {
+      this.fetchetData.length = this.logsService.TakeFetchCount;
     }
   }
 
