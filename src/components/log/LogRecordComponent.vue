@@ -23,11 +23,12 @@
         v-for="(previewLog, index) in log.logsBlockPreviev"
       >
         <LogPreviewComponent
+          v-if="index <= 5 || p_isExpanded"
           :log="previewLog"
           :sharedData="sharedData"
           :verticalViewType="verticalViewType"
           :key="index"
-        ></LogPreviewComponent>
+        />
       </div>
     </div>
   </div>
