@@ -7,25 +7,28 @@
       sideBarIsOpened: sideBarStateEmitter.value && verticalViewType === 1,
     }"
   >
-    <div class="log-record-header">
-      <button v-if="!p_isExpanded" v-on:click="toggle" class="btn-expand">
-        ►
-      </button>
-      <button v-else class="btn-expand" v-on:click="toggle">◄</button>
-      <div class="title elepsis">{{ log.message }}</div>
-      <span class="created-at">{{ createdAt }}</span>
-    </div>
-    <div
-      class="content elepsis"
-      :key="index"
-      v-for="(previewLog, index) in log.logsBlockPreviev"
-    >
-      <LogPreviewComponent
-        :log="previewLog"
-        :sharedData="sharedData"
-        :verticalViewType="verticalViewType"
+    <slot></slot>
+    <div v-if="log.isVisible">
+      <div class="log-record-header">
+        <button v-if="!p_isExpanded" v-on:click="toggle" class="btn-expand">
+          ►
+        </button>
+        <button v-else class="btn-expand" v-on:click="toggle">◄</button>
+        <div class="title elepsis">{{ log.message }}</div>
+        <span class="created-at">{{ createdAt }}</span>
+      </div>
+      <div
+        class="content elepsis"
         :key="index"
-      ></LogPreviewComponent>
+        v-for="(previewLog, index) in log.logsBlockPreviev"
+      >
+        <LogPreviewComponent
+          :log="previewLog"
+          :sharedData="sharedData"
+          :verticalViewType="verticalViewType"
+          :key="index"
+        ></LogPreviewComponent>
+      </div>
     </div>
   </div>
 </template>

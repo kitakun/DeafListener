@@ -8,14 +8,17 @@
     }"
   >
     <transition-group name="slide-fade">
-      <LogRecordComponent
-        v-for="item in fetchetData"
-        :log="item"
-        :key="item?.logId ?? item?.scopeId"
-        :sharedData="fetchetData"
-        :sideBarStateEmitter="sideBarStateEmitter"
-        :verticalViewType="verticalViewType"
-      ></LogRecordComponent>
+        <Waypoint 
+          v-for="item in fetchetData"
+          :key="item?.logId ?? item?.scopeId" @change="onChange"
+          v-bind:id="'wp_' + (item.logId !== undefined ? `log_${item.logId}` : `scope_${item.scopeId}`)">
+          <LogRecordComponent
+            :log="item"
+            :sharedData="fetchetData"
+            :sideBarStateEmitter="sideBarStateEmitter"
+            :verticalViewType="verticalViewType"
+          />
+        </Waypoint>
     </transition-group>
   </div>
   <div v-else>empty :c</div>
@@ -26,6 +29,7 @@
 import { Options, Vue } from "vue-class-component";
 import { Inject, Prop } from "vue-property-decorator";
 // components
+import { Going, Waypoint, WaypointState } from "vue-waypoint";
 import LogRecordComponent from "./LogRecordComponent.vue";
 import Loader from "@/components/layout/Loader.vue";
 // services
@@ -43,6 +47,7 @@ import { Header_LogDirectionViewTypeEnum } from "@/types/SettingEnums";
   components: {
     LogRecordComponent,
     Loader,
+    Waypoint,
   },
 })
 /* here we loading all logs that can show to client */
@@ -125,6 +130,29 @@ export default class LogsListComponent extends Vue {
         disposable();
       }
       this.disposables.length = 0;
+    }
+  }
+
+  public onChange(waypointState: WaypointState): void {
+    if(!waypointState.el || !waypointState.el.id)
+      return;
+    const elementId = Number.parseInt(waypointState.el.id.split('_')[2]);
+    const isItScope = waypointState.el.id.indexOf('_scope_') >= 0;
+    const changedElement = this.fetchetData.find((f) => {
+      if (!isItScope && f instanceof DeafLog) {
+        if (f.logId! === elementId) {
+          return true;
+        }
+      } else if (isItScope && f instanceof DeafScope) {
+        if (f.scopeId! === elementId) {
+          return true;
+        }
+      }
+
+      return false;
+    });
+    if (changedElement && waypointState.going) {
+      changedElement.isVisible = waypointState.going === Going.In;
     }
   }
 
