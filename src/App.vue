@@ -63,25 +63,30 @@ export default class App extends Vue {
   public async mounted(): Promise<void> {
     const projectsInfo = await this.logsService.Hello();
     if (projectsInfo) {
-      if (isDebug()) {
-        console.log(`DB Size=${projectsInfo.databasesize}`);
+      if (projectsInfo.error) {
+        console.error(projectsInfo.error);
+      } else {
+        // load an app
+        if (isDebug()) {
+          console.log(`DB Size=${projectsInfo.databasesize}`);
+        }
+        // pass envs + projects to services
+        const envsToProjsMap = {} as IEnvsToProjects;
+        projectsInfo.envsToProjectsList.forEach((f) => {
+          envsToProjsMap[f.key] = f.valueList;
+        });
+        this.settingsService.allEnvsWithProjectsStream.setValue(envsToProjsMap);
+        // connect live-updates only if we connected to server
+        this.disposables.push(
+          this.settingsService.livetypeLoadingStream.on((isEnabled) => {
+            if (isEnabled) {
+              this.signalRService.connect(this.logsService.logsStream);
+            } else {
+              this.signalRService.disconnect(true);
+            }
+          })
+        );
       }
-      // pass envs + projects to services
-      const envsToProjsMap = {} as IEnvsToProjects;
-      projectsInfo.envsToProjectsList.forEach((f) => {
-        envsToProjsMap[f.key] = f.valueList;
-      });
-      this.settingsService.allEnvsWithProjectsStream.setValue(envsToProjsMap);
-      // connect live-updates only if we connected to server
-      this.disposables.push(
-        this.settingsService.livetypeLoadingStream.on((isEnabled) => {
-          if (isEnabled) {
-            this.signalRService.connect(this.logsService.logsStream);
-          } else {
-            this.signalRService.disconnect(true);
-          }
-        })
-      );
     }
     this.settingsService.setStore(this.storeService);
   }

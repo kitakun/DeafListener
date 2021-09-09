@@ -50,6 +50,9 @@ export class HelloResponse extends jspb.Message {
   getDatabasesize(): string;
   setDatabasesize(value: string): HelloResponse;
 
+  getError(): string;
+  setError(value: string): HelloResponse;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): HelloResponse.AsObject;
   static toObject(includeInstance: boolean, msg: HelloResponse): HelloResponse.AsObject;
@@ -62,6 +65,7 @@ export namespace HelloResponse {
   export type AsObject = {
     envsToProjectsList: Array<MapFieldStringEntry.AsObject>,
     databasesize: string,
+    error: string,
   }
 }
 

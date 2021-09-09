@@ -541,7 +541,8 @@ proto.logiClient.HelloResponse.toObject = function(includeInstance, msg) {
   var f, obj = {
     envsToProjectsList: jspb.Message.toObjectList(msg.getEnvsToProjectsList(),
     proto.logiClient.MapFieldStringEntry.toObject, includeInstance),
-    databasesize: jspb.Message.getFieldWithDefault(msg, 2, "")
+    databasesize: jspb.Message.getFieldWithDefault(msg, 2, ""),
+    error: jspb.Message.getFieldWithDefault(msg, 3, "")
   };
 
   if (includeInstance) {
@@ -587,6 +588,10 @@ proto.logiClient.HelloResponse.deserializeBinaryFromReader = function(msg, reade
       var value = /** @type {string} */ (reader.readString());
       msg.setDatabasesize(value);
       break;
+    case 3:
+      var value = /** @type {string} */ (reader.readString());
+      msg.setError(value);
+      break;
     default:
       reader.skipField();
       break;
@@ -628,6 +633,13 @@ proto.logiClient.HelloResponse.serializeBinaryToWriter = function(message, write
   if (f.length > 0) {
     writer.writeString(
       2,
+      f
+    );
+  }
+  f = message.getError();
+  if (f.length > 0) {
+    writer.writeString(
+      3,
       f
     );
   }
@@ -687,6 +699,24 @@ proto.logiClient.HelloResponse.prototype.getDatabasesize = function() {
  */
 proto.logiClient.HelloResponse.prototype.setDatabasesize = function(value) {
   return jspb.Message.setProto3StringField(this, 2, value);
+};
+
+
+/**
+ * optional string error = 3;
+ * @return {string}
+ */
+proto.logiClient.HelloResponse.prototype.getError = function() {
+  return /** @type {string} */ (jspb.Message.getFieldWithDefault(this, 3, ""));
+};
+
+
+/**
+ * @param {string} value
+ * @return {!proto.logiClient.HelloResponse} returns this
+ */
+proto.logiClient.HelloResponse.prototype.setError = function(value) {
+  return jspb.Message.setProto3StringField(this, 3, value);
 };
 
 
