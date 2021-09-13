@@ -16,7 +16,9 @@ export default class SettingsService {
     public readonly logDirectionViewType: RxVariable<Header_LogDirectionViewTypeEnum>;
     public readonly livetypeLoadingStream: RxVariable<boolean>;
     // logs search sources
-    public readonly searchStream: RxSource<string>;
+    public readonly searchStream: RxVariable<string>;
+    public readonly dateFilerStream: RxVariable<{ from?: Date, to?: Date }>;
+    public readonly emitSearchStream: RxSource<null>;
     // project + env filters
     public readonly allEnvsWithProjectsStream: RxVariable<IEnvsToProjects>;
     public readonly selectedProjectStream: RxVariable<string[]>;
@@ -29,7 +31,12 @@ export default class SettingsService {
         this.logDirectionViewType = new RxVariable<Header_LogDirectionViewTypeEnum>(Header_LogDirectionViewTypeEnum.Grid, true)
         this.livetypeLoadingStream = new RxVariable<boolean>(false, true);
         // search
-        this.searchStream = new RxSource<string>();
+        this.searchStream = new RxVariable<string>('');
+        this.dateFilerStream = new RxVariable<{ from?: Date, to?: Date }>({
+            from: void 0,
+            to: void 0
+        });
+        this.emitSearchStream = new RxSource<null>();
         // proj + env
         this.allEnvsWithProjectsStream = new RxVariable<IEnvsToProjects>({});
         this.selectedProjectStream = new RxVariable<string[]>([]);

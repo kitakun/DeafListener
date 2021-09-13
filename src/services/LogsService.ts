@@ -1,6 +1,8 @@
 // grpc
 import { LoggerClientClient } from '@/proto/generated/Logi_clientServiceClientPb';
 import { FetchLogRequest, HelloRequest, PingRequest } from "@/proto/generated/logi_client_pb";
+import { Timestamp } from "@/proto/generated/timestamp_pb";
+
 // types
 import { DeafLog, DeafScope, IHelloObject } from '@/types/FetchModels';
 import { HubLog, HubScope } from '@/types/HubModels';
@@ -8,6 +10,16 @@ import { HubLog, HubScope } from '@/types/HubModels';
 import { APP_VARS, isDebug } from '@/utils/environments';
 import RxSource from '@/utils/rx/SourceRx';
 import MapService from './MapService';
+
+export interface IFetchFilterQuery {
+    searchQuery?: string;
+    selectedEnvs?: string[];
+    selectedProjects?: string[];
+    selectedDates: {
+        from?: Date | undefined;
+        to?: Date | undefined;
+    }
+}
 
 export default class LogsService {
     public static readonly FETCH_COUNT = 40;
@@ -47,7 +59,7 @@ export default class LogsService {
         return null;
     }
 
-    public async fetch(from?: number, filters?: { searchQuery?: string, selectedEnvs?: string[], selectedProjects?: string[] }): Promise<(DeafScope | DeafLog)[]> {
+    public async fetch(from?: number, filters?: IFetchFilterQuery): Promise<(DeafScope | DeafLog)[]> {
         const request = new FetchLogRequest();
         if (from) {
             request.setFrom(from);
@@ -62,6 +74,22 @@ export default class LogsService {
             }
             if (filters.selectedProjects && filters.selectedProjects.length) {
                 request.setProjectsList(filters.selectedProjects);
+            }
+            if (filters.selectedDates) {
+                if (filters.selectedDates.from) {
+                    const timeMs = filters.selectedDates.from.getTime();
+                    var fromTimestamp = new Timestamp();
+                    fromTimestamp.setSeconds(Math.floor(timeMs / 1000));
+                    fromTimestamp.setNanos((timeMs % 1000) * 1e6);
+                    request.setFromdate(fromTimestamp);
+                }
+                if (filters.selectedDates.to) {
+                    const timeMs = filters.selectedDates.to.getTime();
+                    var fromTimestamp = new Timestamp();
+                    fromTimestamp.setSeconds(Math.floor(timeMs / 1000));
+                    fromTimestamp.setNanos((timeMs % 1000) * 1e6);
+                    request.setTodate(fromTimestamp);
+                }
             }
         }
 

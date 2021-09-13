@@ -5,6 +5,8 @@
       <SearchBlock
         :isBusy="false"
         :searchStream="settingsService.searchStream"
+        :filterDatesStream="settingsService.dateFilerStream"
+        :emitSearchStream="settingsService.emitSearchStream"
         :lookFor="'Search text:'"
       ></SearchBlock>
       <LogsListComponent
@@ -50,9 +52,9 @@ import { isDebug } from "./utils/environments";
   },
 })
 export default class App extends Vue {
+  @Provide() readonly settingsService = new SettingsService();
   @Provide() readonly logsService = new LogsService();
   @Provide() readonly mapService = new MapService();
-  @Provide() readonly settingsService = new SettingsService();
   @Provide() readonly signalRService = new SignalRService();
   @Provide() readonly storeService = new StorageService();
   @Ref() readonly sidenav!: SideNav;
@@ -133,14 +135,18 @@ body {
 }
 
 /* components */
-.btn-expand {
+@mixin btnStyles() {
   box-shadow: inset 0px 1px 0px 0px #276873;
   background: linear-gradient(to bottom, #599bb3 5%, #408c99 100%);
   background-color: #599bb3;
   border: 1px solid #828586;
+  color: #ffffff;
+}
+
+.btn-expand {
+  @include btnStyles();
   display: inline-block;
   cursor: pointer;
-  color: #ffffff;
   font-family: Arial;
   font-size: 13px;
   font-weight: bold;
@@ -197,6 +203,27 @@ input[type="checkbox"] {
   height: 24px;
   position: relative;
   top: 6px;
+}
+
+.v3dp__datepicker {
+  .v3dp__input_wrapper {
+    display: flex;
+  }
+  input {
+    border: 1px solid #cacaca;
+    width: 80px;
+    height: 40px;
+    border-top-left-radius: 4px;
+    border-bottom-left-radius: 4px;
+  }
+  .v3dp__clearable {
+    // clear-value button styles
+    @include btnStyles();
+    padding: 1px 4px;
+    left: 0px;
+    border-top-right-radius: 4px;
+    border-bottom-right-radius: 4px;
+  }
 }
 
 /* vue - animations */

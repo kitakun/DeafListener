@@ -13,7 +13,7 @@
         "@grpc/proto-loader": "^0.6.4",
         "@improbable-eng/grpc-web": "^0.14.0",
         "@microsoft/signalr": "^5.0.9",
-        "core-js": "^3.6.5",
+        "core-js": "^3.17.3",
         "google-protobuf": "^3.17.3",
         "grpc-web": "^1.2.1",
         "reflect-metadata": "^0.1.13",
@@ -21,13 +21,14 @@
         "vue": "^3.0.0",
         "vue-class-component": "^8.0.0-rc.1",
         "vue-property-decorator": "^9.1.2",
-        "vue-waypoint": "^4.2.1"
+        "vue-waypoint": "^4.2.1",
+        "vue3-datepicker": "^0.2.5"
     },
     "devDependencies": {
         "@vue/cli-plugin-babel": "~4.5.0",
         "@vue/cli-plugin-pwa": "~4.5.0",
         "@vue/cli-plugin-typescript": "~4.5.0",
-        "@vue/cli-service": "~4.5.0",
+        "@vue/cli-service": "^4.5.13",
         "@vue/compiler-sfc": "^3.0.0",
         "node-sass": "^6.0.1",
         "protobufjs": "^6.11.2",
