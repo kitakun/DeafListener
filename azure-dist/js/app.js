@@ -1560,7 +1560,7 @@ eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) *
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"isDebug\", function() { return isDebug; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"APP_VARS\", function() { return APP_VARS; });\nfunction isDebug() {\n  return !!window.webpackHotUpdate;\n}\nvar APP_VARS = {\n  serverUrl: 'https://78.37.233.82',\n  protoPort: '6001',\n  signalPort: '6002',\n  signalLogHub: 'logHub'\n};\n\n//# sourceURL=webpack:///./src/utils/environments.ts?");
+eval("__webpack_require__.r(__webpack_exports__);\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"isDebug\", function() { return isDebug; });\n/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, \"APP_VARS\", function() { return APP_VARS; });\nfunction isDebug() {\n  return !!window.webpackHotUpdate;\n}\nvar APP_VARS = {\n  serverUrl: 'https://78.81.147.40',\n  protoPort: '6001',\n  signalPort: '6002',\n  signalLogHub: 'logHub'\n};\n\n//# sourceURL=webpack:///./src/utils/environments.ts?");
 
 /***/ }),
 

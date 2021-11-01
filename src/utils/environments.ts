@@ -3,7 +3,7 @@ export function isDebug():boolean{
 }
 
 export const APP_VARS = {
-    serverUrl: 'https://78.37.233.82',
+    serverUrl: 'https://78.81.147.40',
     protoPort: '6001',
     signalPort: '6002',
     signalLogHub: 'logHub'
