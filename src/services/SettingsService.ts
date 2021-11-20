@@ -11,6 +11,8 @@ const settings_key = 'app-client-settings';
 
 export default class SettingsService {
 
+    // general settings
+    public readonly showSidebar: RxVariable<boolean>;
     // logs view settings
     public readonly logViewType: RxVariable<Header_LogViewTypeEnum>;
     public readonly logDirectionViewType: RxVariable<Header_LogDirectionViewTypeEnum>;
@@ -27,6 +29,9 @@ export default class SettingsService {
     private store?: StorageService;
 
     constructor() {
+        // general
+        this.showSidebar = new RxVariable<boolean>(true, true);
+        //
         this.logViewType = new RxVariable<Header_LogViewTypeEnum>(Header_LogViewTypeEnum.ShowAllScopes, true)
         this.logDirectionViewType = new RxVariable<Header_LogDirectionViewTypeEnum>(Header_LogDirectionViewTypeEnum.Grid, true)
         this.livetypeLoadingStream = new RxVariable<boolean>(false, true);
@@ -48,6 +53,9 @@ export default class SettingsService {
             this.store = storeService;
             const loadedSettings = this.store.load<AppSettingsData>(settings_key);
             if (loadedSettings) {
+                // general
+                this.showSidebar.setValue(loadedSettings.showSidebar);
+                //
                 this.logViewType.setValue(loadedSettings.logViewType);
                 this.logDirectionViewType.setValue(loadedSettings.logDirectionType);
                 this.livetypeLoadingStream.setValue(loadedSettings.enableLive);
@@ -56,6 +64,7 @@ export default class SettingsService {
                 }
             }
             // listen for setts changes
+            this.showSidebar.on(_ => this.saveNewSetts(), false);
             this.logViewType.on(_ => this.saveNewSetts(), false);
             this.logDirectionViewType.on(_ => this.saveNewSetts(), false);
             this.livetypeLoadingStream.on(_ => this.saveNewSetts(), false);
@@ -67,6 +76,7 @@ export default class SettingsService {
 
     private saveNewSetts() {
         this.store?.save<AppSettingsData>(settings_key, {
+            showSidebar: this.showSidebar.value,
             enableLive: this.livetypeLoadingStream.value,
             logDirectionType: this.logDirectionViewType.value,
             logViewType: this.logViewType.value,

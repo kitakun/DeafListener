@@ -1,7 +1,7 @@
 <template>
-  <Header :title="'PIM Logs'" :sidebarEmitter="sideBarStateEmitter"></Header>
-  <SideNav ref="sidenav" :sidebarEmitter="sideBarStateEmitter">
-    <PageBody :sideBarStateEmitter="sideBarStateEmitter">
+  <Header :title="'PIM Logs'" :sidebarEmitter="settingsService.showSidebar"></Header>
+  <SideNav ref="sidenav" :sidebarEmitter="settingsService.showSidebar">
+    <PageBody :sideBarStateEmitter="settingsService.showSidebar">
       <SearchBlock
         :isBusy="false"
         :searchStream="settingsService.searchStream"
@@ -10,7 +10,7 @@
         :lookFor="'Search text:'"
       ></SearchBlock>
       <LogsListComponent
-        :sideBarStateEmitter="sideBarStateEmitter"
+        :sideBarStateEmitter="settingsService.showSidebar"
       ></LogsListComponent>
     </PageBody>
   </SideNav>
@@ -37,7 +37,6 @@ import SearchBlock from "@/components/layout/SearchBlock.vue";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
-import RxVariable from "./utils/rx/VariableRx";
 import { IEnvsToProjects } from "./types/SettingsModels";
 import { isDebug } from "./utils/environments";
 
@@ -58,7 +57,6 @@ export default class App extends Vue {
   @Provide() readonly signalRService = new SignalRService();
   @Provide() readonly storeService = new StorageService();
   @Ref() readonly sidenav!: SideNav;
-  public readonly sideBarStateEmitter = new RxVariable<Boolean>(false, true);
 
   private disposables: (() => void)[] = [];
 
