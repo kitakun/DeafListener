@@ -6,6 +6,7 @@ import { Timestamp } from "@/proto/generated/timestamp_pb";
 // types
 import { DeafLog, DeafScope, IHelloObject } from '@/types/FetchModels';
 import { HubLog, HubScope } from '@/types/HubModels';
+import LoadingAction from '@/types/LoadingServiceModels';
 // services
 import { APP_VARS, isDebug } from '@/utils/environments';
 import RxSource from '@/utils/rx/SourceRx';
@@ -38,28 +39,39 @@ export default class LogsService {
         this._client = new LoggerClientClient(`${APP_VARS.serverUrl}:${APP_VARS.protoPort}`);
     }
 
-    public async ping(): Promise<boolean> {
+    public async ping(loader?: LoadingAction): Promise<boolean> {
         try {
             const response = await this._client.ping(new PingRequest(), null);
+            if (loader?.isCancelled ?? false) {
+                return false;
+            }
             if (response && response.toObject())
                 return true;
         } catch {
             // bad
+        } finally {
+            loader?.finish();
         }
         return false;
     }
 
-    public async Hello(): Promise<IHelloObject | null> {
+    public async Hello(loader?: LoadingAction): Promise<IHelloObject | null> {
         try {
             const response = await this._client.hello(new HelloRequest(), null);
+            if (loader?.isCancelled ?? false) {
+                return null;
+            }
             return response.toObject();
         } catch {
-
+            // ignore
+        } finally {
+            loader?.finish();
         }
         return null;
     }
 
-    public async fetch(from?: number, filters?: IFetchFilterQuery): Promise<(DeafScope | DeafLog)[]> {
+    public async fetch(from?: number, filters?: IFetchFilterQuery, loader?: LoadingAction): Promise<(DeafScope | DeafLog)[]> {
+        console.log('lets load');
         const request = new FetchLogRequest();
         if (from) {
             request.setFrom(from);
@@ -93,18 +105,24 @@ export default class LogsService {
             }
         }
 
-
-        const resp = await this._client.fetch(request, {});
-        const jsResp = resp.toObject();
-
-        if (jsResp.issuccess) {
-            if (isDebug()) {
-                console.log('recieved', jsResp);
+        try {
+            const resp = await this._client.fetch(request, {});
+            if (loader?.isCancelled ?? false) {
+                return [];
             }
-            return this.mapService.mapFetchToClient(jsResp);
-        }
+            const jsResp = resp.toObject();
 
-        console.error(jsResp.error);
+            if (jsResp.issuccess) {
+                if (isDebug()) {
+                    console.log('recieved', jsResp);
+                }
+                return this.mapService.mapFetchToClient(jsResp);
+            }
+
+            console.error(jsResp.error);
+        } finally {
+            loader?.finish();
+        }
         return [];
     }
 }

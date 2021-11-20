@@ -6,6 +6,9 @@
     <div class="half">
       <h1>{{ title }}</h1>
     </div>
+    <div class="half fw">
+      <slot></slot>
+    </div>
   </div>
 </template>
 
@@ -36,12 +39,18 @@ export default class Header extends Vue {
   flex-direction: row;
   flex-wrap: nowrap;
   align-content: center;
-  justify-content: flex-start;;
+  justify-content: flex-start;
   align-items: center;
   .sidenav-btn {
     width: 40px;
     padding-right: 60px;
     padding-left: 20px;
+  }
+  .half {
+    &.fw {
+      min-width: 100px;
+      width: calc(100% - 300px);
+    }
   }
 }
 </style>

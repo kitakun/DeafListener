@@ -34,7 +34,7 @@
 
 <script lang="ts">
 import { Options, Vue } from "vue-class-component";
-import { Inject, Prop } from "vue-property-decorator";
+import { Inject, Prop, Provide } from "vue-property-decorator";
 // components
 import { Going, Waypoint, WaypointState } from "vue-waypoint";
 import LogRecordComponent from "./LogRecordComponent.vue";
@@ -43,6 +43,7 @@ import Loader from "@/components/layout/Loader.vue";
 import LogsService from "@/services/LogsService";
 import MapService from "@/services/MapService";
 import SettingsService from "@/services/SettingsService";
+import LoadingService from "@/services/LoadingService";
 // types | utils
 import { DeafLog, DeafScope } from "@/types/FetchModels";
 import { isDebug } from "@/utils/environments";
@@ -63,6 +64,7 @@ export default class LogsListComponent extends Vue {
   @Inject() readonly logsService!: LogsService;
   @Inject() readonly settingsService!: SettingsService;
   @Inject() readonly mapService!: MapService;
+  @Inject() readonly loadingService!: LoadingService;
 
   public fetchetData: (DeafScope | DeafLog)[] = [];
   public isLoading = false;
@@ -188,7 +190,8 @@ export default class LogsListComponent extends Vue {
   private async fetchLogsAndRender(): Promise<void> {
     this.isLoading = true;
     try {
-      if (await this.logsService.ping()) {
+      const pingLoader = this.loadingService.createNewLoading();
+      if (await this.logsService.ping(pingLoader)) {
 
         // filer values
         const searchQuery = this.settingsService.searchStream.value;
@@ -196,12 +199,13 @@ export default class LogsListComponent extends Vue {
         const selectedProjects = this.settingsService.selectedProjectStream.value;
         const selectedDates = this.settingsService.dateFilerStream.value;
 
+        const loadDataLoader = this.loadingService.createNewLoading();
         const loadedData = await this.logsService.fetch(void 0, {
           searchQuery: searchQuery,
           selectedEnvs: selectedEnvs,
           selectedProjects: selectedProjects,
           selectedDates: selectedDates
-        });
+        }, loadDataLoader);
         if (loadedData.length > 20) {
           console.log("recieved count", loadedData.length);
           loadedData.length = 20;
@@ -226,6 +230,7 @@ export default class LogsListComponent extends Vue {
 <style scoped lang="scss">
 .logs-list {
   width: calc(100% - 20px);
+  min-width: 570px;
   padding-left: 20px;
   padding-bottom: 20px;
   overflow: auto;

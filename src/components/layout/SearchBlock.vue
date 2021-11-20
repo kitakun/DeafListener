@@ -122,6 +122,7 @@ export default class SearchBlock extends Vue {
   flex-direction: row;
   align-items: flex-end;
   width: calc(100% - 40px);
+  min-width: 570px;
   height: 120px;
   padding: 20px;
   margin: 20px auto 20px auto;

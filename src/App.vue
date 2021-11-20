@@ -1,5 +1,7 @@
 <template>
-  <Header :title="'PIM Logs'" :sidebarEmitter="settingsService.showSidebar"></Header>
+  <Header :title="'PIM Logs'" :sidebarEmitter="settingsService.showSidebar">
+    <LoadingBlock/>
+  </Header>
   <SideNav ref="sidenav" :sidebarEmitter="settingsService.showSidebar">
     <PageBody :sideBarStateEmitter="settingsService.showSidebar">
       <SearchBlock
@@ -29,11 +31,13 @@ import MapService from "./services/MapService";
 import SettingsService from "./services/SettingsService";
 import SignalRService from "./services/SignalrService";
 import StorageService from "./services/StorageService";
+import LoadingService from "./services/LoadingService";
 // components
 import Header from "@/components/layout/Header.vue";
 import SideNav from "@/components/settings/SideNav.vue";
 import PageBody from "@/components/layout/PageBody.vue";
 import SearchBlock from "@/components/layout/SearchBlock.vue";
+import LoadingBlock from "@/components/layout/LoadingBlock.vue";
 import ExpandableBlock from "@/components/layout/ExpandableBlock.vue";
 import LogsListComponent from "@/components/log/LogsListComponent.vue";
 // utils
@@ -46,6 +50,7 @@ import { isDebug } from "./utils/environments";
     PageBody,
     SideNav,
     SearchBlock,
+    LoadingBlock,
     ExpandableBlock,
     LogsListComponent,
   },
@@ -56,12 +61,14 @@ export default class App extends Vue {
   @Provide() readonly mapService = new MapService();
   @Provide() readonly signalRService = new SignalRService();
   @Provide() readonly storeService = new StorageService();
+  @Provide() readonly loadingService = new LoadingService();
   @Ref() readonly sidenav!: SideNav;
 
   private disposables: (() => void)[] = [];
 
   public async mounted(): Promise<void> {
-    const projectsInfo = await this.logsService.Hello();
+    const helloLoader = this.loadingService.createNewLoading();
+    const projectsInfo = await this.logsService.Hello(helloLoader);
     if (projectsInfo) {
       if (projectsInfo.error) {
         console.error(projectsInfo.error);
